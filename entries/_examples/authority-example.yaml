@@ -1,9 +1,0 @@
-# Documentation only — not validated or merged. See schema/entry.schema.json.
-role: authority
-slug: example-authority
-contact: "https://github.com/example-authority"
-date_registered: "2026-08-30"
-description: "Example trust anchor for the ds42 sandbox."
-trust_model: "DID/SSI (did:web), self-issued, no external federation."
-claims_issued: "Membership credential attesting DSP conformance, issued after a self-declared conformance-suite run."
-onboarding_url: "https://example-authority.example/onboard"

@@ -1,0 +1,16 @@
+{
+  "@context": {
+    "@vocab": "https://ds42.org/ns/registry#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dateRegistered": { "@type": "xsd:date" },
+    "onboardingUrl": { "@type": "@id" },
+    "endpoint": { "@type": "@id" }
+  },
+  "@id": "https://ds42.org/registry/connector/example-connector",
+  "@type": "Connector",
+  "slug": "example-connector",
+  "contact": "https://github.com/example-connector",
+  "dateRegistered": "2026-08-30",
+  "description": "Example DSP connector: publishes a catalog, negotiates contracts, transfers synthetic data.",
+  "endpoint": "https://connector.example-connector.example/api/dsp"
+}

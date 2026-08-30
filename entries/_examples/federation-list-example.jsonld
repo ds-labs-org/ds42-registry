@@ -1,0 +1,16 @@
+{
+  "@context": {
+    "@vocab": "https://ds42.org/ns/registry#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dateRegistered": { "@type": "xsd:date" },
+    "onboardingUrl": { "@type": "@id" },
+    "endpoint": { "@type": "@id" }
+  },
+  "@id": "https://ds42.org/registry/federation-list/example-federation-list",
+  "@type": "FederationList",
+  "slug": "example-federation-list",
+  "contact": "https://github.com/example-federation-list",
+  "dateRegistered": "2026-08-30",
+  "description": "Example catalog broker: harvests other participants' catalogs and re-serves them for discovery.",
+  "endpoint": "https://broker.example-federation-list.example/catalog"
+}

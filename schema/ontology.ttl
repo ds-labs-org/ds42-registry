@@ -1,0 +1,146 @@
+@prefix ds:     <https://ds42.org/ns/registry#> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+#
+# The ds42 participant registry vocabulary.
+#
+# Describes the four ADR-0009 membership roles (connector, authority,
+# federation-list, service) and the properties a registry entry
+# (entries/<role>/<slug>.jsonld in ds-labs-org/ds42-registry) carries. See
+# dataspace's docs/adr/0010-*.md for why the registry uses JSON-LD/OWL/
+# SHACL rather than plain YAML/JSON Schema — this hub's own domain (DSP,
+# DCAT, ODRL) is RDF-based, so the registry describing itself in RDF is
+# consistency, not decoration.
+#
+# `https://ds42.org/ns/registry#` is a namespace this hub controls but
+# does not yet serve as a dereferenceable document — same "worked
+# example, not yet standing infrastructure" status as everything else
+# this study hasn't wired up a live endpoint for. Validation
+# (schema/shapes.ttl) does not require it to resolve.
+#
+<https://ds42.org/ns/registry>
+  a owl:Ontology ;
+  rdfs:label "ds42 participant registry vocabulary" ;
+  rdfs:comment "Classes and properties for ds42.org's participant registry entries (entries/<role>/<slug>.jsonld in ds-labs-org/ds42-registry)." ;
+  dcterms:isPartOf <https://ds42.org> .
+
+# --- Classes -----------------------------------------------------------
+
+ds:ParticipantEntry
+  a owl:Class ;
+  rdfs:label "Participant entry" ;
+  rdfs:comment "A ds42 member's declaration of one role it holds. Abstract: real entries are typed as exactly one of the four concrete subclasses below, per ADR-0009's four ways to participate." .
+
+ds:Connector
+  a owl:Class ;
+  rdfs:subClassOf ds:ParticipantEntry ;
+  rdfs:label "Connector" ;
+  rdfs:comment "A DSP participant: publishes a catalog, negotiates contracts, transfers data. The baseline ds42 role." .
+
+ds:Authority
+  a owl:Class ;
+  rdfs:subClassOf ds:ParticipantEntry ;
+  rdfs:label "Authority" ;
+  rdfs:comment "A trust anchor: issues participant credentials and defines an onboarding scheme. ds42 expects several, run by different members; the hub operates none itself." .
+
+ds:FederationList
+  a owl:Class ;
+  rdfs:subClassOf ds:ParticipantEntry ;
+  rdfs:label "Federation list" ;
+  rdfs:comment "A catalog broker: harvests other participants' catalogs and re-serves them for discovery. Speaking only part of DSP is a legitimate membership shape, not a deficiency." .
+
+ds:Service
+  a owl:Class ;
+  rdfs:subClassOf ds:ParticipantEntry ;
+  rdfs:label "Service" ;
+  rdfs:comment "Anything else the network is more useful for having: vocabulary/shape-validation endpoints, policy-decision services, identity resolution hosting, a conformance-suite runner, monitoring, a looking glass." .
+
+# --- Properties common to every entry -----------------------------------
+
+ds:slug
+  a owl:DatatypeProperty ;
+  rdfs:domain ds:ParticipantEntry ;
+  rdfs:range xsd:string ;
+  rdfs:label "slug" ;
+  rdfs:comment "Short, URL-safe identifier for this participant (pattern ^[a-z0-9-]+$), unique within its role. Must match the entry's own file name and the last segment of its @id." .
+
+ds:contact
+  a owl:DatatypeProperty ;
+  rdfs:domain ds:ParticipantEntry ;
+  rdfs:range xsd:string ;
+  rdfs:label "contact" ;
+  rdfs:comment "A GitHub handle or URL a stranger can use to reach this participant." .
+
+ds:dateRegistered
+  a owl:DatatypeProperty ;
+  rdfs:subPropertyOf dcterms:created ;
+  rdfs:domain ds:ParticipantEntry ;
+  rdfs:range xsd:date ;
+  rdfs:label "date registered" ;
+  rdfs:comment "YYYY-MM-DD this entry was first submitted." .
+
+ds:description
+  a owl:DatatypeProperty ;
+  rdfs:subPropertyOf dcterms:description ;
+  rdfs:domain ds:ParticipantEntry ;
+  rdfs:range xsd:string ;
+  rdfs:label "description" ;
+  rdfs:comment "Optional free-text: what this participant runs or offers." .
+
+ds:registeredBy
+  a owl:DatatypeProperty ;
+  rdfs:domain ds:ParticipantEntry ;
+  rdfs:range xsd:string ;
+  rdfs:label "registered by" ;
+  rdfs:comment "Informational only, set automatically by the Get started wizard: the GitHub login that opened the registering PR. Never trusted by CI for authorization — see schema/shapes.ttl and dataspace's ADR-0010 for the actual (git-blame-based) authorship check." .
+
+# --- Authority-specific properties ---------------------------------------
+
+ds:trustModel
+  a owl:DatatypeProperty ;
+  rdfs:domain ds:Authority ;
+  rdfs:range xsd:string ;
+  rdfs:label "trust model" ;
+  rdfs:comment "The trust model this authority operates under (DID/SSI, eIDAS2/PKI, from-scratch, etc.)." .
+
+ds:claimsIssued
+  a owl:DatatypeProperty ;
+  rdfs:domain ds:Authority ;
+  rdfs:range xsd:string ;
+  rdfs:label "claims issued" ;
+  rdfs:comment "What claims/credentials this authority issues, and to whom." .
+
+ds:onboardingUrl
+  a owl:ObjectProperty ;
+  rdfs:domain ds:Authority ;
+  rdfs:label "onboarding URL" ;
+  rdfs:comment "Where a participant goes to onboard and request a credential from this authority." .
+
+# --- Connector / federation-list / service property ----------------------
+
+ds:endpoint
+  a owl:ObjectProperty ;
+  rdfs:domain [ a owl:Class ; owl:unionOf (ds:Connector ds:FederationList ds:Service) ] ;
+  rdfs:label "endpoint" ;
+  rdfs:comment "A URL confirming this participant is actually running something (CI's reachability probe — liveness only, not a Dataspace Protocol conformance check; see dataspace's ADR-0010)." .
+
+# --- Cardinality restrictions (descriptive; schema/shapes.ttl is what CI
+#     actually enforces — see that file's header for why the split) -------
+
+ds:Authority rdfs:subClassOf
+  [ a owl:Restriction ; owl:onProperty ds:trustModel ;   owl:minCardinality 1 ] ,
+  [ a owl:Restriction ; owl:onProperty ds:claimsIssued ; owl:minCardinality 1 ] ,
+  [ a owl:Restriction ; owl:onProperty ds:onboardingUrl ; owl:minCardinality 1 ] .
+
+ds:Connector rdfs:subClassOf
+  [ a owl:Restriction ; owl:onProperty ds:endpoint ; owl:minCardinality 1 ] .
+
+ds:FederationList rdfs:subClassOf
+  [ a owl:Restriction ; owl:onProperty ds:endpoint ; owl:minCardinality 1 ] .
+
+ds:Service rdfs:subClassOf
+  [ a owl:Restriction ; owl:onProperty ds:endpoint ; owl:minCardinality 1 ] .

@@ -19,21 +19,27 @@ or service (no wizard for those roles yet).
 ## Manual steps
 
 1. Fork this repository.
-2. Add `entries/<role>/<slug>.yaml`, matching
-   [`schema/entry.schema.json`](schema/entry.schema.json) — see
+2. Add `entries/<role>/<slug>.jsonld` — a JSON-LD document typed
+   (`@type`) as one of `Connector`, `Authority`, `FederationList`,
+   `Service`, matching the vocabulary in
+   [`schema/ontology.ttl`](schema/ontology.ttl) and validated against
+   [`schema/shapes.ttl`](schema/shapes.ttl) — see
    [`entries/_examples/`](entries/_examples/) for a filled-in example per
-   role. `<slug>` must be a short, URL-safe identifier
-   (`^[a-z0-9-]+$`) and must match the `slug` field inside the file.
-   `authority` entries need `trust_model`/`claims_issued`/`onboarding_url`;
-   the other three roles need an `endpoint` — CI does a plain reachability
-   check against whichever one applies (see README.md), so make sure it's
-   actually live before you open the PR.
-3. Open a pull request. CI (`.github/workflows/validate.yml`) checks the
-   file against the schema, probes the URL above, and — for a new
-   entry — merges automatically if your PR adds at most `MAX_NEW_ENTRIES`
-   new files and touches nothing else. No human approval needed for that
-   case. Anything broader (too many new entries at once, a change outside
-   `entries/`) is left open for manual review instead.
+   role, including the `@context` block to copy verbatim (it's the same
+   in every entry). `<slug>` must be a short, URL-safe identifier
+   (`^[a-z0-9-]+$`) and must match both the entry's `slug` property and
+   the file name. `authority` entries need
+   `trustModel`/`claimsIssued`/`onboardingUrl`; the other three roles
+   need an `endpoint` — CI does a plain reachability check against
+   whichever one applies (see README.md), so make sure it's actually live
+   before you open the PR.
+3. Open a pull request. CI (`.github/workflows/validate.yml`) validates
+   the file against the SHACL shapes, probes the URL above, and — for a
+   new entry — merges automatically if your PR adds at most
+   `MAX_NEW_ENTRIES` new files and touches nothing else. No human
+   approval needed for that case. Anything broader (too many new entries
+   at once, a change outside `entries/`) is left open for manual review
+   instead.
 
 You can also open a PR that edits **your own existing entry** — CI checks
 this by comparing your PR's git commit authorship against who originally

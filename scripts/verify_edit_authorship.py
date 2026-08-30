@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Decide whether a PR's *edits* to existing entries/**/*.yaml files are
+"""Decide whether a PR's *edits* to existing entries/**/*.jsonld files are
 self-service-eligible, i.e. whether every line the PR removes or changes
 was itself originally authored by the same person opening this PR.
 

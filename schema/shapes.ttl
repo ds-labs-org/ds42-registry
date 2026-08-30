@@ -1,0 +1,98 @@
+@prefix ds:   <https://ds42.org/ns/registry#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+#
+# SHACL shapes CI actually validates every entry against
+# (scripts/validate_entries.py, via pySHACL).
+#
+# ontology.ttl is the *descriptive* vocabulary (classes, properties,
+# domains/ranges, human-readable comments, OWL cardinality restrictions
+# for documentation and reasoning tools). This file is the *enforcement*
+# layer: OWL restrictions describe what a well-formed instance looks
+# like, they don't by themselves reject a malformed one — SHACL is the
+# W3C-standard tool actually built for that, so CI validates against
+# shapes here rather than trying to make OWL reasoning do double duty as
+# a validator.
+#
+# pySHACL is invoked with rdfs inference on (see scripts/validate_entries.py)
+# so that a ds:Authority individual is also recognized as a ds:ParticipantEntry
+# via ontology.ttl's rdfs:subClassOf chain — ds42:ParticipantEntryShape
+# below applies to every role, not only entries typed directly as
+# ds:ParticipantEntry (nothing is — every real entry is typed as one of
+# the four concrete subclasses).
+#
+
+ds:ParticipantEntryShape
+  a sh:NodeShape ;
+  sh:targetClass ds:ParticipantEntry ;
+  sh:property [
+    sh:path ds:slug ;
+    sh:datatype xsd:string ;
+    sh:pattern "^[a-z0-9-]+$" ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:message "slug is required, exactly one, and must match ^[a-z0-9-]+$" ;
+  ] ;
+  sh:property [
+    sh:path ds:contact ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:message "contact is required and exactly one string" ;
+  ] ;
+  sh:property [
+    sh:path ds:dateRegistered ;
+    sh:datatype xsd:date ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:message "dateRegistered is required, exactly one, and must be an xsd:date (YYYY-MM-DD)" ;
+  ] ;
+  sh:property [
+    sh:path ds:description ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:message "description, if present, must be a single string" ;
+  ] ;
+  sh:property [
+    sh:path ds:registeredBy ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:message "registeredBy, if present, must be a single string" ;
+  ] .
+
+ds:AuthorityShape
+  a sh:NodeShape ;
+  sh:targetClass ds:Authority ;
+  sh:property [
+    sh:path ds:trustModel ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:message "authority entries require exactly one trustModel string" ;
+  ] ;
+  sh:property [
+    sh:path ds:claimsIssued ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:message "authority entries require exactly one claimsIssued string" ;
+  ] ;
+  sh:property [
+    sh:path ds:onboardingUrl ;
+    sh:nodeKind sh:IRI ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:message "authority entries require exactly one onboardingUrl, an IRI" ;
+  ] .
+
+ds:EndpointRequiredShape
+  a sh:NodeShape ;
+  sh:targetClass ds:Connector, ds:FederationList, ds:Service ;
+  sh:property [
+    sh:path ds:endpoint ;
+    sh:nodeKind sh:IRI ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:message "connector/federation-list/service entries require exactly one endpoint, an IRI" ;
+  ] .

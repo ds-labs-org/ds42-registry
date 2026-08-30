@@ -1,0 +1,16 @@
+{
+  "@context": {
+    "@vocab": "https://ds42.org/ns/registry#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dateRegistered": { "@type": "xsd:date" },
+    "onboardingUrl": { "@type": "@id" },
+    "endpoint": { "@type": "@id" }
+  },
+  "@id": "https://ds42.org/registry/service/example-service",
+  "@type": "Service",
+  "slug": "example-service",
+  "contact": "https://github.com/example-service",
+  "dateRegistered": "2026-08-30",
+  "description": "Example supporting service: a policy-decision endpoint other participants can call.",
+  "endpoint": "https://pdp.example-service.example/health"
+}

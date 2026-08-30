@@ -49,7 +49,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install validators
-        run: pip install jsonschema pyyaml
+        run: pip install rdflib pyshacl
 
       - name: List changed entry files
         id: changed
@@ -60,7 +60,7 @@ jobs:
           echo "$files" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
 
-      - name: Validate against schema/entry.schema.json + reachability probe
+      - name: Validate against schema/shapes.ttl (SHACL) + reachability probe
         run: python3 scripts/validate_entries.py ${{ steps.changed.outputs.files }}
 
   verify-edit-authorship:

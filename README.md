@@ -7,9 +7,17 @@ git-managed whois database. Membership on ds42 is conformance to DSP and
 nothing else, in any of four roles: **connector**, **authority**,
 **federation list**, or **service**. This repository is where a member
 says so — a stranger opens a pull request adding a file describing
-themselves, CI checks it against the schema below, and a well-formed,
+themselves, CI checks it against the vocabulary below, and a well-formed,
 new-entry-only PR merges on its own. No central authority approves an
 entry by hand; that would contradict the hub's whole premise.
+
+Entries are **JSON-LD**, described by an **OWL ontology in Turtle**
+([`schema/ontology.ttl`](schema/ontology.ttl)) and enforced by
+**SHACL shapes** ([`schema/shapes.ttl`](schema/shapes.ttl)) — not plain
+YAML/JSON Schema. This isn't decoration: ds42's own domain (DSP
+catalogs, DCAT, ODRL policies) is already RDF-based, so a registry that
+describes participants the same way is consistency with what it's a
+registry *for*, not an added dependency.
 
 See [ds42.org](https://ds42.org)'s
 [ADR-0009](https://ds42.org/adr/0009) (why the hub exists, the four
@@ -21,21 +29,32 @@ repository.
 
 ## Layout
 
-One YAML file per participant entry, under:
+One JSON-LD file per participant entry, under:
 
 ```
-entries/<role>/<slug>.yaml
+entries/<role>/<slug>.jsonld
 ```
 
 where `<role>` is one of `connector`, `authority`, `federation-list`,
 `service`, and `<slug>` is a short, URL-safe identifier for the
-participant (`^[a-z0-9-]+$`). Every entry's shape is defined by
-[`schema/entry.schema.json`](schema/entry.schema.json); filled-in examples
+participant (`^[a-z0-9-]+$`) — matching both the entry's `slug` property
+and the last path segment of its `@id`. Each entry is typed (`@type`) as
+one of `ds:Connector`, `ds:Authority`, `ds:FederationList`, `ds:Service`
+from [`schema/ontology.ttl`](schema/ontology.ttl), which is what CI
+checks against the entry's directory. The vocabulary and its per-role
+required properties are described in that same file; what CI actually
+*enforces* is [`schema/shapes.ttl`](schema/shapes.ttl) (SHACL — see "How a
+PR gets merged" for why the two are separate files). Filled-in examples
 for each role live under [`entries/_examples/`](entries/_examples/) (not
 validated or merged — documentation only). `authority` entries carry
-`trust_model`/`claims_issued`/`onboarding_url`; the other three roles
-carry an `endpoint` — see "Reachability check" below for what that's
-used for.
+`trustModel`/`claimsIssued`/`onboardingUrl`; the other three roles carry
+an `endpoint` — see "How a PR gets merged" below for what that's used
+for.
+
+Every entry file is self-contained: its `@context` is inlined (a
+`@vocab` pointing at `https://ds42.org/ns/registry#`, matching
+`ontology.ttl`'s namespace), so validating one doesn't depend on
+dereferencing anything over the network.
 
 ## How an entry gets in
 
@@ -52,14 +71,21 @@ used for.
 across three jobs:
 
 1. **validate** — asserts the PR touches nothing outside `entries/**`
-   (including this very workflow file), then parses every changed file as
-   YAML and checks it against the schema (required fields, valid `role`,
-   no slug collision within its role), then runs a **reachability probe**:
-   a plain HTTP GET against the entry's `onboarding_url` (authority) or
-   `endpoint` (the other three roles), with any non-5xx response counting
-   as reachable. This is *not* a Dataspace Protocol conformance check —
-   just "does something answer here" — a real DSP conformance probe (e.g.
-   via the [DataspaceTCK](https://ds42.org/spikes/2026-08-27-dataspacetck-compliance-suites))
+   (including this very workflow file), parses every changed file as
+   JSON-LD into an RDF graph, and validates it with **pySHACL** against
+   [`schema/shapes.ttl`](schema/shapes.ttl) (with rdfs subclass inference
+   over [`schema/ontology.ttl`](schema/ontology.ttl) turned on, so e.g. a
+   `ds:Authority` individual is also checked against the shared
+   `ds:ParticipantEntryShape`, not only `ds:AuthorityShape`) — required
+   properties, datatypes, the slug pattern, IRI-typed URLs. It also checks
+   the entry's `@type` and `slug` match its own directory/file name and
+   that no other entry in the same role directory reuses the slug. Then
+   it runs a **reachability probe**: a plain HTTP GET against the entry's
+   `onboardingUrl` (authority) or `endpoint` (the other three roles), with
+   any non-5xx response counting as reachable. This is *not* a Dataspace
+   Protocol conformance check — just "does something answer here" — a
+   real DSP conformance probe (e.g. via the
+   [DataspaceTCK](https://ds42.org/spikes/2026-08-27-dataspacetck-compliance-suites))
    is deferred; see [ADR-0010](https://ds42.org/adr/0010)'s Consequences.
    Note this means CI makes an outbound call to a URL the PR author
    supplies — accepted as a public-runner-egress-only risk (no internal
@@ -67,8 +93,8 @@ across three jobs:
 2. **verify-edit-authorship** — for any file this PR *modifies* (not
    adds), checks whether every line it removes or changes was itself
    originally authored by the same person opening this PR. Authorship is
-   never taken from anything inside the YAML (a self-declared
-   `registered_by` field would be trivially spoofable) — it's derived
+   never taken from anything inside the entry itself (a self-declared
+   `registeredBy` property would be trivially spoofable) — it's derived
    from `git blame` against the base branch plus GitHub's own
    commit-to-account resolution (`GET /repos/.../commits/{sha}`'s
    `.author.login`, which GitHub only sets when a commit's email matches
