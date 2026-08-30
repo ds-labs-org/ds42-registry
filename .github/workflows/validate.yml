@@ -1,0 +1,84 @@
+name: Validate registry entries
+
+on:
+  pull_request:
+    paths:
+      - "entries/**"
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install validators
+        run: pip install jsonschema pyyaml
+
+      - name: List changed entry files
+        id: changed
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          files=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" -- 'entries/**')
+          echo "files<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$files" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Validate against schema/entry.schema.json
+        run: python3 scripts/validate_entries.py ${{ steps.changed.outputs.files }}
+
+  auto-merge:
+    needs: validate
+    if: success()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check the diff is exactly one new file under entries/
+        id: shape
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          status=$(git diff --name-status "origin/${{ github.base_ref }}...HEAD")
+          echo "$status"
+          # Exactly one line, starting with "A" (added), path under entries/,
+          # and not under entries/_examples/.
+          count=$(echo "$status" | grep -c . || true)
+          added_entry=$(echo "$status" | grep -E '^A\sentries/' | grep -v 'entries/_examples/' || true)
+          if [ "$count" = "1" ] && [ -n "$added_entry" ]; then
+            echo "eligible=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "eligible=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Enable auto-merge (new-entry-only PRs)
+        if: steps.shape.outputs.eligible == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}"
+
+      # steps.shape.outputs.eligible == 'false': deliberately do nothing.
+      # The PR stays open for manual review — it touched an existing entry
+      # or a path outside entries/, which this workflow does not auto-merge.
+      #
+      # NOTE: this job's merge step is a no-op unless the repository has
+      # "Allow auto-merge" enabled under Settings -> General -> Pull Requests
+      # — that's a one-time manual repo setting, not something a workflow can
+      # toggle for itself.

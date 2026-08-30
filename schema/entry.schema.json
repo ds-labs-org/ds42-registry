@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ds-labs-org/ds42-registry/blob/main/schema/entry.schema.json",
+  "title": "ds42 participant registry entry",
+  "description": "One participant's declaration of a role on ds42.org. File path: entries/<role>/<slug>.yaml, where <role> and <slug> must match this entry's own 'role' and 'slug' fields.",
+  "type": "object",
+  "required": ["role", "slug", "contact", "date_registered"],
+  "additionalProperties": false,
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": ["connector", "authority", "federation-list", "service"],
+      "description": "Which of ds42's four membership roles (ADR-0009) this entry declares."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Short, URL-safe identifier for this participant. Must match the entry's own file name."
+    },
+    "contact": {
+      "type": "string",
+      "minLength": 1,
+      "description": "A GitHub handle or URL a stranger can use to reach this participant."
+    },
+    "date_registered": {
+      "type": "string",
+      "format": "date",
+      "description": "YYYY-MM-DD this entry was first submitted."
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional free-text: what this participant runs or offers."
+    },
+    "trust_model": {
+      "type": "string",
+      "description": "Authority role only: the trust model this authority operates under (DID/SSI, eIDAS2/PKI, from-scratch, etc.)."
+    },
+    "claims_issued": {
+      "type": "string",
+      "description": "Authority role only: what claims/credentials this authority issues, and to whom."
+    },
+    "onboarding_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Authority role only: where a participant goes to onboard and request a credential."
+    }
+  },
+  "if": {
+    "properties": { "role": { "const": "authority" } }
+  },
+  "then": {
+    "required": ["trust_model", "claims_issued", "onboarding_url"]
+  }
+}
