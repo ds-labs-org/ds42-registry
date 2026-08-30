@@ -45,16 +45,21 @@ already depends on:
   echo to check for: IDS defines its own `ids:Participant` — confirmed
   from the published ontology — as a *certified, legally-named* entity
   (`legalName`, `jurisdiction`, `participantCertification`). This is
-  exactly why `ds:ParticipantEntry` isn't named bare `Participant`: it
-  carries none of that, so it's linked via `rdfs:seeAlso` with the
-  distinction stated explicitly, not left to be assumed.
+  exactly why this vocabulary's base class is named `ds:Registrant` — the
+  same term a domain registry's WHOIS record uses for its record-holder,
+  matching this registry's own dn42-style WHOIS-inspired design — rather
+  than any `Participant`-rooted name: it carries none of IDS's
+  certification/legal-entity baggage, and a genuinely different word
+  avoids the naming echo outright instead of merely disclaiming it. Still
+  linked to `ids:Participant` via `rdfs:seeAlso`, since the *kind* of
+  thing both name is real kinship even though the two aren't equivalent.
 - **[W3C DID Core](https://www.w3.org/ns/did#)** — `ds:onboardingUrl` is a
   `did:serviceEndpoint`, the same term DSP's own context reuses for
   identity-associated endpoints.
 - **[Gaia-X](https://w3id.org/gaia-x/2404#)** — the closest existing
   prior art for this registry's whole approach: JSON-LD self-descriptions
   validated by SHACL, built on DCAT and the W3C Organization Ontology.
-  `ds:ParticipantEntry` is related to Gaia-X's `gx:LegalParticipant` by
+  `ds:Registrant` is related to Gaia-X's `gx:LegalParticipant` by
   `rdfs:seeAlso`, not equivalence — a ds42 entry is a much lighter-weight
   role declaration, not a full legal-entity self-description.
 - **[W3C Organization Ontology](http://www.w3.org/ns/org#)** and
@@ -116,7 +121,7 @@ across three jobs:
    [`schema/shapes.ttl`](schema/shapes.ttl) (with rdfs subclass inference
    over [`schema/ontology.ttl`](schema/ontology.ttl) turned on, so e.g. a
    `ds:Authority` individual is also checked against the shared
-   `ds:ParticipantEntryShape`, not only `ds:AuthorityShape`) — required
+   `ds:RegistrantShape`, not only `ds:AuthorityShape`) — required
    properties, datatypes, the slug pattern, IRI-typed URLs. It also checks
    the entry's `@type` and `slug` match its own directory/file name and
    that no other entry in the same role directory reuses the slug. Then

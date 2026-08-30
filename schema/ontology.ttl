@@ -66,11 +66,15 @@
 #   its own `ids:Participant` class — confirmed from the published
 #   ontology, not assumed — as a *certified, legally-named* entity
 #   (`legalName`, `jurisdiction`, `legalForm`, `participantCertification`).
-#   This is the actual, closest naming echo to worry about, and exactly
-#   why `ds:ParticipantEntry` is not named bare `Participant`: it does not
-#   carry, require, or imply IDS-style certification or legal-entity
-#   attributes, so it is linked via `rdfs:seeAlso` only, with this
-#   disambiguation stated rather than left implicit.
+#   That is the actual, closest naming echo to worry about, and exactly
+#   why this vocabulary's base class is `ds:Registrant`, not `Participant`
+#   or any `*Participant*` compound: it does not carry, require, or imply
+#   IDS-style certification or legal-entity attributes, and picking a
+#   genuinely different word (rather than a qualified variant of theirs)
+#   avoids the naming echo outright instead of merely disclaiming it.
+#   Still linked via `rdfs:seeAlso`, since the *kind* of thing both name —
+#   an entity declaring itself into a dataspace — is real kinship, even
+#   though the two aren't equivalent.
 # - **W3C DID Core** (`did:`, <https://www.w3.org/ns/did#>) —
 #   `did:serviceEndpoint` (DID Core §5.6) is the term DSP's own context
 #   reuses for endpoint URLs associated with a subject's identity; ds42's
@@ -105,35 +109,35 @@
 
 # --- Classes -----------------------------------------------------------
 
-ds:ParticipantEntry
+ds:Registrant
   a owl:Class ;
-  rdfs:label "Participant entry" ;
-  rdfs:comment "A ds42 member's declaration of one role it holds. Abstract: real entries are typed as exactly one of the four concrete subclasses below, per ADR-0009's four ways to participate. Deliberately named ParticipantEntry, not bare Participant: IDS's ids:Participant and Gaia-X's gx:LegalParticipant both denote a certified/legally-named entity (legalName, jurisdiction, participantCertification and similar) — a ds42 entry is a much lighter-weight role declaration and carries none of that, so it is related to both via rdfs:seeAlso only, never asserted equivalent." ;
+  rdfs:label "Registrant" ;
+  rdfs:comment "A ds42 member's declaration of one role it holds — named Registrant, the same term a domain registry's WHOIS record uses for its record-holder, matching this registry's own dn42-style WHOIS-inspired design (see ADR-0009), and deliberately not a Participant-rooted name. IDS's ids:Participant and Gaia-X's gx:LegalParticipant both denote a certified, legally-named entity (legalName, jurisdiction, participantCertification and similar); a ds42 Registrant is a much lighter-weight role declaration and carries none of that. Abstract: real entries are typed as exactly one of the four concrete subclasses below, per ADR-0009's four ways to participate." ;
   rdfs:seeAlso ids:Participant , gx:LegalParticipant , org:Organization , foaf:Agent .
 
 ds:Connector
   a owl:Class ;
-  rdfs:subClassOf ds:ParticipantEntry ;
+  rdfs:subClassOf ds:Registrant ;
   rdfs:label "Connector" ;
   rdfs:comment "A DSP participant: publishes a catalog, negotiates contracts, transfers data. The baseline ds42 role." ;
   rdfs:seeAlso dcat:DataService .
 
 ds:Authority
   a owl:Class ;
-  rdfs:subClassOf ds:ParticipantEntry ;
+  rdfs:subClassOf ds:Registrant ;
   rdfs:label "Authority" ;
   rdfs:comment "A trust anchor: issues participant credentials and defines an onboarding scheme. ds42 expects several, run by different members; the hub operates none itself. Its trust model is typically DID-based (see ds:trustModel) and its issuance role corresponds to an 'issuer' in the W3C Verifiable Credentials Data Model." .
 
 ds:FederationList
   a owl:Class ;
-  rdfs:subClassOf ds:ParticipantEntry ;
+  rdfs:subClassOf ds:Registrant ;
   rdfs:label "Federation list" ;
   rdfs:comment "A catalog broker: harvests other participants' catalogs and re-serves them for discovery. Speaking only part of DSP is a legitimate membership shape, not a deficiency. Broader than DSP's own dspace:CatalogService (a catalog-serving component type within one participant's self-description) — a ds42 federation list is a distinct, separately-registered participant that aggregates *other* participants' catalogs, closer to the eclipse-edc federated-catalog / ds-catalog-broker-rs pattern this study has already vendored/tracked." ;
   rdfs:seeAlso dspace:CatalogService .
 
 ds:Service
   a owl:Class ;
-  rdfs:subClassOf ds:ParticipantEntry ;
+  rdfs:subClassOf ds:Registrant ;
   rdfs:label "Service" ;
   rdfs:comment "Anything else the network is more useful for having: vocabulary/shape-validation endpoints, policy-decision services, identity resolution hosting, a conformance-suite runner, monitoring, a looking glass." .
 
@@ -141,7 +145,7 @@ ds:Service
 
 ds:slug
   a owl:DatatypeProperty ;
-  rdfs:domain ds:ParticipantEntry ;
+  rdfs:domain ds:Registrant ;
   rdfs:range xsd:string ;
   rdfs:label "slug" ;
   rdfs:comment "Short, URL-safe identifier for this participant (pattern ^[a-z0-9-]+$), unique within its role. Must match the entry's own file name and the last segment of its @id. Registry-local and human-chosen, not necessarily the same value/format as a dspace:participantId used in a live DSP exchange — the same *kind* of identifier, not asserted to be interchangeable with it." ;
@@ -149,7 +153,7 @@ ds:slug
 
 ds:contact
   a owl:DatatypeProperty ;
-  rdfs:domain ds:ParticipantEntry ;
+  rdfs:domain ds:Registrant ;
   rdfs:range xsd:string ;
   rdfs:label "contact" ;
   rdfs:comment "A GitHub handle or URL a stranger can use to reach this participant." ;
@@ -158,7 +162,7 @@ ds:contact
 ds:dateRegistered
   a owl:DatatypeProperty ;
   rdfs:subPropertyOf dcterms:created ;
-  rdfs:domain ds:ParticipantEntry ;
+  rdfs:domain ds:Registrant ;
   rdfs:range xsd:date ;
   rdfs:label "date registered" ;
   rdfs:comment "YYYY-MM-DD this entry was first submitted." .
@@ -166,14 +170,14 @@ ds:dateRegistered
 ds:description
   a owl:DatatypeProperty ;
   rdfs:subPropertyOf dcterms:description ;
-  rdfs:domain ds:ParticipantEntry ;
+  rdfs:domain ds:Registrant ;
   rdfs:range xsd:string ;
   rdfs:label "description" ;
   rdfs:comment "Optional free-text: what this participant runs or offers." .
 
 ds:registeredBy
   a owl:DatatypeProperty ;
-  rdfs:domain ds:ParticipantEntry ;
+  rdfs:domain ds:Registrant ;
   rdfs:range xsd:string ;
   rdfs:label "registered by" ;
   rdfs:comment "Informational only, set automatically by the Get started wizard: the GitHub login that opened the registering PR. Never trusted by CI for authorization — see schema/shapes.ttl and dataspace's ADR-0010 for the actual (git-blame-based) authorship check." .

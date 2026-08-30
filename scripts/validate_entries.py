@@ -11,7 +11,7 @@ clear message per file. Checks, per file:
   - valid JSON-LD (parses as an RDF graph)
   - conforms to schema/shapes.ttl (SHACL, with rdfs subclass inference
     against schema/ontology.ttl so e.g. a ds:Authority individual is also
-    validated against the shared ds:ParticipantEntryShape)
+    validated against the shared ds:RegistrantShape)
   - @type / slug match the file's own path (entries/<role>/<slug>.jsonld)
   - no other existing file under entries/<role>/ already uses the same
     slug

@@ -16,16 +16,16 @@
 # a validator.
 #
 # pySHACL is invoked with rdfs inference on (see scripts/validate_entries.py)
-# so that a ds:Authority individual is also recognized as a ds:ParticipantEntry
-# via ontology.ttl's rdfs:subClassOf chain — ds42:ParticipantEntryShape
+# so that a ds:Authority individual is also recognized as a ds:Registrant
+# via ontology.ttl's rdfs:subClassOf chain — ds:RegistrantShape
 # below applies to every role, not only entries typed directly as
-# ds:ParticipantEntry (nothing is — every real entry is typed as one of
+# ds:Registrant (nothing is — every real entry is typed as one of
 # the four concrete subclasses).
 #
 
-ds:ParticipantEntryShape
+ds:RegistrantShape
   a sh:NodeShape ;
-  sh:targetClass ds:ParticipantEntry ;
+  sh:targetClass ds:Registrant ;
   sh:property [
     sh:path ds:slug ;
     sh:datatype xsd:string ;
