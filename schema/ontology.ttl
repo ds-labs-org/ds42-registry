@@ -10,6 +10,7 @@
 @prefix foaf:    <http://xmlns.com/foaf/0.1/> .
 @prefix org:     <http://www.w3.org/ns/org#> .
 @prefix gx:      <https://w3id.org/gaia-x/2404#> .
+@prefix ids:     <https://w3id.org/idsa/core/> .
 
 #
 # The ds42 participant registry vocabulary.
@@ -59,6 +60,17 @@
 #   catalog-serving component), both linked below, and itself reuses
 #   `dcat:` and `did:` (see below) rather than minting everything fresh —
 #   this vocabulary follows the same reuse discipline.
+# - **International Data Spaces (IDS) Information Model** (`ids:`,
+#   <https://w3id.org/idsa/core/>) — DSP's direct ancestor (IDSA
+#   contributed the initial Dataspace Protocol specification). IDS defines
+#   its own `ids:Participant` class — confirmed from the published
+#   ontology, not assumed — as a *certified, legally-named* entity
+#   (`legalName`, `jurisdiction`, `legalForm`, `participantCertification`).
+#   This is the actual, closest naming echo to worry about, and exactly
+#   why `ds:ParticipantEntry` is not named bare `Participant`: it does not
+#   carry, require, or imply IDS-style certification or legal-entity
+#   attributes, so it is linked via `rdfs:seeAlso` only, with this
+#   disambiguation stated rather than left implicit.
 # - **W3C DID Core** (`did:`, <https://www.w3.org/ns/did#>) —
 #   `did:serviceEndpoint` (DID Core §5.6) is the term DSP's own context
 #   reuses for endpoint URLs associated with a subject's identity; ds42's
@@ -89,15 +101,15 @@
   rdfs:label "ds42 participant registry vocabulary" ;
   rdfs:comment "Classes and properties for ds42.org's participant registry entries (entries/<role>/<slug>.jsonld in ds-labs-org/ds42-registry)." ;
   dcterms:isPartOf <https://ds42.org> ;
-  dcterms:relation dcat: , dspace: , did: , foaf: , org: , gx: .
+  dcterms:relation dcat: , dspace: , did: , foaf: , org: , gx: , ids: .
 
 # --- Classes -----------------------------------------------------------
 
 ds:ParticipantEntry
   a owl:Class ;
   rdfs:label "Participant entry" ;
-  rdfs:comment "A ds42 member's declaration of one role it holds. Abstract: real entries are typed as exactly one of the four concrete subclasses below, per ADR-0009's four ways to participate. Related to, but lighter-weight than, Gaia-X's gx:LegalParticipant self-description (which Gaia-X itself grounds in org:Organization/foaf:Agent) — a ds42 entry names a role a participant holds, not a full legal-entity self-description." ;
-  rdfs:seeAlso gx:LegalParticipant , org:Organization , foaf:Agent .
+  rdfs:comment "A ds42 member's declaration of one role it holds. Abstract: real entries are typed as exactly one of the four concrete subclasses below, per ADR-0009's four ways to participate. Deliberately named ParticipantEntry, not bare Participant: IDS's ids:Participant and Gaia-X's gx:LegalParticipant both denote a certified/legally-named entity (legalName, jurisdiction, participantCertification and similar) — a ds42 entry is a much lighter-weight role declaration and carries none of that, so it is related to both via rdfs:seeAlso only, never asserted equivalent." ;
+  rdfs:seeAlso ids:Participant , gx:LegalParticipant , org:Organization , foaf:Agent .
 
 ds:Connector
   a owl:Class ;

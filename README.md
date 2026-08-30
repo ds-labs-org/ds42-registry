@@ -40,6 +40,14 @@ already depends on:
 - **[The Dataspace Protocol's own vocabulary](https://w3id.org/dspace/2025/1/)**
   — `ds:slug`/`ds:FederationList` are related to (not asserted equal to)
   DSP's own `dspace:participantId`/`dspace:CatalogService`.
+- **[International Data Spaces (IDS) Information Model](https://w3id.org/idsa/core/)**
+  — DSP's direct ancestor, and the source of the closest actual naming
+  echo to check for: IDS defines its own `ids:Participant` — confirmed
+  from the published ontology — as a *certified, legally-named* entity
+  (`legalName`, `jurisdiction`, `participantCertification`). This is
+  exactly why `ds:ParticipantEntry` isn't named bare `Participant`: it
+  carries none of that, so it's linked via `rdfs:seeAlso` with the
+  distinction stated explicitly, not left to be assumed.
 - **[W3C DID Core](https://www.w3.org/ns/did#)** — `ds:onboardingUrl` is a
   `did:serviceEndpoint`, the same term DSP's own context reuses for
   identity-associated endpoints.
