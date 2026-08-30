@@ -258,6 +258,17 @@ ds:endpoint
 # --- Cardinality restrictions (descriptive; schema/shapes.ttl is what CI
 #     actually enforces — see that file's header for why the split) -------
 
+ds:Registrant rdfs:subClassOf
+  [ a owl:Restriction ; owl:onProperty ds:slug ;           owl:minCardinality 1 ] ,
+  [ a owl:Restriction ; owl:onProperty ds:contact ;        owl:minCardinality 1 ] ,
+  [ a owl:Restriction ; owl:onProperty ds:dateRegistered ; owl:minCardinality 1 ] .
+# ds:description and ds:registeredBy carry no restriction here: both are
+# genuinely optional (registeredBy in particular is only ever set by the
+# wizard's own submission flow, never by a hand-authored PR) — this is
+# now the ontology's complete, accurate statement of what every
+# Registrant requires, matching schema/shapes.ttl's ParticipantEntryShape
+# rather than only partially restating it as before this addition.
+
 ds:Authority rdfs:subClassOf
   [ a owl:Restriction ; owl:onProperty ds:trustModel ;   owl:minCardinality 1 ] ,
   [ a owl:Restriction ; owl:onProperty ds:claimsIssued ; owl:minCardinality 1 ] ,
