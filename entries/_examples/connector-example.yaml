@@ -4,3 +4,4 @@ slug: example-connector
 contact: "https://github.com/example-connector"
 date_registered: "2026-08-30"
 description: "Example DSP connector: publishes a catalog, negotiates contracts, transfers synthetic data."
+endpoint: "https://connector.example-connector.example/api/dsp"

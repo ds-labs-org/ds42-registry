@@ -32,7 +32,10 @@ where `<role>` is one of `connector`, `authority`, `federation-list`,
 participant (`^[a-z0-9-]+$`). Every entry's shape is defined by
 [`schema/entry.schema.json`](schema/entry.schema.json); filled-in examples
 for each role live under [`entries/_examples/`](entries/_examples/) (not
-validated or merged — documentation only).
+validated or merged — documentation only). `authority` entries carry
+`trust_model`/`claims_issued`/`onboarding_url`; the other three roles
+carry an `endpoint` — see "Reachability check" below for what that's
+used for.
 
 ## How an entry gets in
 
@@ -45,14 +48,48 @@ validated or merged — documentation only).
 
 ## How a PR gets merged
 
-`.github/workflows/validate.yml` runs on every PR touching `entries/**`:
+`.github/workflows/validate.yml` runs on every PR touching `entries/**`,
+across three jobs:
 
-1. **validate** — every changed file is parsed as YAML and checked
-   against the schema (required fields, valid `role`, no slug collision
-   within its role).
-2. **auto-merge** — only if validation passed *and* the PR's entire diff
-   is exactly one new file under `entries/**` (no existing entry touched,
-   no other path changed), the PR is auto-merged. Anything broader — an
-   edit to someone else's entry, a change outside `entries/`, multiple
-   files at once — is left open for manual review instead. That
-   restriction is what makes "no human gatekeeper" a safe default.
+1. **validate** — asserts the PR touches nothing outside `entries/**`
+   (including this very workflow file), then parses every changed file as
+   YAML and checks it against the schema (required fields, valid `role`,
+   no slug collision within its role), then runs a **reachability probe**:
+   a plain HTTP GET against the entry's `onboarding_url` (authority) or
+   `endpoint` (the other three roles), with any non-5xx response counting
+   as reachable. This is *not* a Dataspace Protocol conformance check —
+   just "does something answer here" — a real DSP conformance probe (e.g.
+   via the [DataspaceTCK](https://ds42.org/spikes/2026-08-27-dataspacetck-compliance-suites))
+   is deferred; see [ADR-0010](https://ds42.org/adr/0010)'s Consequences.
+   Note this means CI makes an outbound call to a URL the PR author
+   supplies — accepted as a public-runner-egress-only risk (no internal
+   resources reachable, no secrets in the request), see ADR-0010.
+2. **verify-edit-authorship** — for any file this PR *modifies* (not
+   adds), checks whether every line it removes or changes was itself
+   originally authored by the same person opening this PR. Authorship is
+   never taken from anything inside the YAML (a self-declared
+   `registered_by` field would be trivially spoofable) — it's derived
+   from `git blame` against the base branch plus GitHub's own
+   commit-to-account resolution (`GET /repos/.../commits/{sha}`'s
+   `.author.login`, which GitHub only sets when a commit's email matches
+   a *verified* email on a real account). If GitHub can't resolve either
+   the original or the new commit to a verified profile, or the two don't
+   match, this job fails — the PR is not auto-merge-eligible, full stop.
+   Every commit the Get started wizard makes goes through GitHub's own
+   Contents API with no custom author/committer set, so GitHub creates
+   and signs that commit itself on the authenticated user's behalf — it's
+   both correctly attributed and shown as "Verified" for free. A
+   hand-authored PR only clears this check if its own git commits' author
+   email matches a verified email on the PR-opener's GitHub account.
+   **A stronger future guarantee** — requiring every entry-touching
+   commit to carry a cryptographic signature (GPG/SSH) rather than
+   relying on GitHub's account-email matching — is named as a deferred
+   hardening step in ADR-0010, not implemented yet.
+3. **auto-merge** — only runs after both jobs above succeed, then checks
+   the PR's diff *shape*: nothing outside `entries/**`/`entries/_examples/`,
+   and at most `MAX_NEW_ENTRIES` (currently `2`, set in the workflow's
+   `env:`) newly added files. If the shape check also passes, the PR is
+   auto-merged. Anything broader — too many new entries at once, an edit
+   whose authorship didn't clear, a change outside `entries/` — is left
+   open for manual review instead. That combination of restrictions is
+   what makes "no human gatekeeper" a safe default.

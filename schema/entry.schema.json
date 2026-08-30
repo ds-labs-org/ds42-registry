@@ -43,12 +43,25 @@
       "type": "string",
       "format": "uri",
       "description": "Authority role only: where a participant goes to onboard and request a credential."
+    },
+    "endpoint": {
+      "type": "string",
+      "format": "uri",
+      "description": "connector/federation-list/service roles only: a URL CI can reach to confirm this participant is actually running something (see 'Reachability check' in README.md — this is not a DSP conformance check, just liveness)."
+    },
+    "registered_by": {
+      "type": "string",
+      "description": "Informational only, set automatically by the Get started wizard's submission flow: the GitHub login that opened the registering PR. CI never trusts this field for authorization — see README.md's 'Editing your own entry'."
     }
   },
-  "if": {
-    "properties": { "role": { "const": "authority" } }
-  },
-  "then": {
-    "required": ["trust_model", "claims_issued", "onboarding_url"]
-  }
+  "allOf": [
+    {
+      "if": { "properties": { "role": { "const": "authority" } } },
+      "then": { "required": ["trust_model", "claims_issued", "onboarding_url"] }
+    },
+    {
+      "if": { "properties": { "role": { "enum": ["connector", "federation-list", "service"] } } },
+      "then": { "required": ["endpoint"] }
+    }
+  ]
 }

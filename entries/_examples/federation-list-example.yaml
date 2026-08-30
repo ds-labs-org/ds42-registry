@@ -4,3 +4,4 @@ slug: example-federation-list
 contact: "https://github.com/example-federation-list"
 date_registered: "2026-08-30"
 description: "Example catalog broker: harvests other participants' catalogs and re-serves them for discovery."
+endpoint: "https://broker.example-federation-list.example/catalog"

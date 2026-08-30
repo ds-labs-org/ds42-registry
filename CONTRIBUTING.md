@@ -24,13 +24,22 @@ or service (no wizard for those roles yet).
    [`entries/_examples/`](entries/_examples/) for a filled-in example per
    role. `<slug>` must be a short, URL-safe identifier
    (`^[a-z0-9-]+$`) and must match the `slug` field inside the file.
+   `authority` entries need `trust_model`/`claims_issued`/`onboarding_url`;
+   the other three roles need an `endpoint` — CI does a plain reachability
+   check against whichever one applies (see README.md), so make sure it's
+   actually live before you open the PR.
 3. Open a pull request. CI (`.github/workflows/validate.yml`) checks the
-   file against the schema and, if your PR adds exactly that one new file
-   and touches nothing else, merges it automatically — no human approval
-   needed. If your PR is broader than that (e.g. it also edits an
-   existing entry, or touches files outside `entries/`), it's left open
-   for manual review instead.
+   file against the schema, probes the URL above, and — for a new
+   entry — merges automatically if your PR adds at most `MAX_NEW_ENTRIES`
+   new files and touches nothing else. No human approval needed for that
+   case. Anything broader (too many new entries at once, a change outside
+   `entries/`) is left open for manual review instead.
 
-Don't edit someone else's entry in the same PR as your own — that always
-routes to manual review, and it isn't yours to change anyway. If your own
-details change, open a follow-up PR that only touches your own file.
+You can also open a PR that edits **your own existing entry** — CI checks
+this by comparing your PR's git commit authorship against who originally
+committed the lines you're changing (via GitHub's own verified-account
+resolution, not by trusting anything inside the file), and auto-merges if
+they match. Don't edit someone else's entry in the same PR as your own —
+it will never match, always routes to manual review, and it isn't yours
+to change anyway. See README.md's "How a PR gets merged" for exactly how
+that check works.

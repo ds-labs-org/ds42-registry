@@ -4,3 +4,4 @@ slug: example-service
 contact: "https://github.com/example-service"
 date_registered: "2026-08-30"
 description: "Example supporting service: a policy-decision endpoint other participants can call."
+endpoint: "https://pdp.example-service.example/health"
