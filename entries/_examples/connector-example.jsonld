@@ -1,6 +1,6 @@
 {
   "@context": {
-    "@vocab": "https://ds42.org/ns/registry#",
+    "@vocab": "https://ds42.org/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "dateRegistered": { "@type": "xsd:date" },
     "onboardingUrl": { "@type": "@id" },

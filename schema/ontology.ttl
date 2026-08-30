@@ -1,4 +1,4 @@
-@prefix ds:      <https://ds42.org/ns/registry#> .
+@prefix ds:      <https://ds42.org/> .
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
@@ -23,11 +23,15 @@
 # DCAT, ODRL) is RDF-based, so the registry describing itself in RDF is
 # consistency, not decoration.
 #
-# `https://ds42.org/ns/registry#` is a namespace this hub controls but
-# does not yet serve as a dereferenceable document — same "worked
-# example, not yet standing infrastructure" status as everything else
-# this study hasn't wired up a live endpoint for. Validation
-# (schema/shapes.ttl) does not require it to resolve.
+# `https://ds42.org/` is used as a slash-separated namespace (not a
+# `#`-fragment one) *specifically* so each term is independently
+# dereferenceable over plain HTTP: `https://ds42.org/Authority`,
+# `https://ds42.org/trustModel`, etc. are each routed on ds42.org to a
+# page representing that exact resource (dataspace ADR-0016) — a
+# fragment URI can't do that, since the fragment never reaches the
+# server (or, here, the client-side router) at all. Validation
+# (schema/shapes.ttl) does not require any of this to resolve; it's a
+# consequence of wanting the URIs to be real, not a requirement of them.
 #
 # --- Grounding in existing dataspace/identity vocabularies ---------------
 #
@@ -100,10 +104,10 @@
 #   (`rdfs:seeAlso`), since a ds42 entry names a participant rather than
 #   modelling it as a full `org:Organization`/`foaf:Agent` resource.
 #
-<https://ds42.org/ns/registry>
+<https://ds42.org/ns>
   a owl:Ontology ;
   rdfs:label "ds42 participant registry vocabulary" ;
-  rdfs:comment "Classes and properties for ds42.org's participant registry entries (entries/<role>/<slug>.jsonld in ds-labs-org/ds42-registry)." ;
+  rdfs:comment "Classes and properties for ds42.org's participant registry entries (entries/<role>/<slug>.jsonld in ds-labs-org/ds42-registry). Identifies the vocabulary as a whole, distinct from https://ds42.org/ (the site's homepage) and from an individual term like https://ds42.org/Authority (this vocabulary's own ds:Authority)." ;
   dcterms:isPartOf <https://ds42.org> ;
   dcterms:relation dcat: , dspace: , did: , foaf: , org: , gx: , ids: .
 

@@ -121,9 +121,14 @@ hand-typed mirror — see dataspace's ADR-0015), so it can never drift
 from what's declared here.
 
 Every entry file is self-contained: its `@context` is inlined (a
-`@vocab` pointing at `https://ds42.org/ns/registry#`, matching
-`ontology.ttl`'s namespace), so validating one doesn't depend on
-dereferencing anything over the network.
+`@vocab` pointing at `https://ds42.org/`, matching `ontology.ttl`'s
+namespace), so validating one doesn't depend on dereferencing anything
+over the network — even though, unlike many vocabulary namespaces,
+`https://ds42.org/`'s terms *are* individually dereferenceable: each one
+(`https://ds42.org/Authority`, `https://ds42.org/trustModel`, ...) is
+slash-separated specifically so ds42.org can route each to a real page
+representing that resource (dataspace ADR-0016), which a `#`-fragment
+namespace couldn't do.
 
 ## How an entry gets in
 

@@ -33,7 +33,6 @@ from pyshacl import validate as shacl_validate
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 ONTOLOGY_PATH = REPO_ROOT / "schema" / "ontology.ttl"
 SHAPES_PATH = REPO_ROOT / "schema" / "shapes.ttl"
-REGISTRY_NS = "https://ds42.org/ns/registry#"
 PROBE_TIMEOUT_SECONDS = 8
 
 # entries/<ROLE_DIR>/ <-> @type local name.
