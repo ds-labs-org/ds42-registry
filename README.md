@@ -98,22 +98,27 @@ validated or merged — documentation only). `authority` entries carry
 `trustModel`/`claimsIssued`/`onboardingUrl`; the other three roles carry
 an `endpoint` — see "How a PR gets merged" below for what that's used
 for. `trustModel` is a **controlled vocabulary, not free text** — one of
-`ds:Dcp`, `ds:DidSsiOther`, `ds:Eidas2Pki`, `ds:PkiGovernanceAuthority`,
-`ds:FromScratch` (`ds:TrustModel`'s five individuals in
-[`schema/ontology.ttl`](schema/ontology.ttl)); write the bare name (e.g.
-`"trustModel": "Dcp"`) and the entry's `@context` (`"trustModel":
-{"@type": "@vocab"}`, already in every example) expands it to the real
-IRI. `ds:Dcp` — the Decentralized Claims Protocol — is named specifically
-rather than folded into a generic DID/SSI bucket: it's this hub's own
-reference connector stack's default identity mechanism
-([ADR-0008](https://ds42.org/adr/0008) vendors `eclipse-edc/IdentityHub`
-as reference material, and
+`ds:Dcp`, `ds:OpenId4Vc`, `ds:DidSsiOther`, `ds:Eidas2Pki`,
+`ds:PkiGovernanceAuthority`, `ds:FromScratch` (`ds:TrustModel`'s six
+individuals in [`schema/ontology.ttl`](schema/ontology.ttl)); write the
+bare name (e.g. `"trustModel": "Dcp"`) and the entry's `@context`
+(`"trustModel": {"@type": "@vocab"}`, already in every example) expands
+it to the real IRI. `ds:Dcp` — the Decentralized Claims Protocol — is
+named specifically rather than folded into a generic DID/SSI bucket:
+it's this hub's own reference connector stack's default identity
+mechanism ([ADR-0008](https://ds42.org/adr/0008) vendors
+`eclipse-edc/IdentityHub` as reference material, and
 [a benchmark](https://ds42.org/benchmarks/dcp-auth-overhead) already
-measured its real auth overhead), so `ds:DidSsiOther` exists
-alongside it for a DID/SSI approach that *isn't* DCP (OIDC4VC, DIDComm,
-etc.) without quietly claiming DCP conformance. ds42.org's Get Started
-wizard renders this as a dropdown generated from the same five
-individuals, not a hand-typed list — see dataspace's ADR-0013.
+measured its real auth overhead). `ds:OpenId4Vc` is split out from
+`ds:Eidas2Pki` for the same reason: it's a wire protocol
+(OID4VCI/OID4VP), not a trust anchor — used *by* eIDAS2/EUDI but also
+independently of it. `ds:DidSsiOther` exists for a DID/SSI approach
+that's neither of those (DIDComm/Aries, KERI-based) without quietly
+claiming conformance with a protocol this hub has actually benchmarked.
+ds42.org's Get Started wizard renders this as a dropdown **generated at
+build time by parsing this file directly** (a git submodule, not a
+hand-typed mirror — see dataspace's ADR-0015), so it can never drift
+from what's declared here.
 
 Every entry file is self-contained: its `@context` is inlined (a
 `@vocab` pointing at `https://ds42.org/ns/registry#`, matching

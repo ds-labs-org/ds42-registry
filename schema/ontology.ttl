@@ -130,24 +130,29 @@ ds:Authority
 
 ds:TrustModel
   a owl:Class ;
-  owl:oneOf ( ds:Dcp ds:DidSsiOther ds:Eidas2Pki ds:PkiGovernanceAuthority ds:FromScratch ) ;
+  owl:oneOf ( ds:Dcp ds:OpenId4Vc ds:DidSsiOther ds:Eidas2Pki ds:PkiGovernanceAuthority ds:FromScratch ) ;
   rdfs:label "Trust model" ;
-  rdfs:comment "The closed set of trust models a ds:Authority may declare — surveyed in authority/README.md's 'Reference landscape' and 'Alternative trust model' sections. A controlled vocabulary, not free text, so the Get Started wizard can offer a real dropdown instead of an unconstrained string; schema/shapes.ttl's sh:in enforces the same five values CI-side." .
+  rdfs:comment "The closed set of trust models a ds:Authority may declare — surveyed in authority/README.md's 'Reference landscape' and 'Alternative trust model' sections. A controlled vocabulary, not free text, so the Get Started wizard can offer a real dropdown instead of an unconstrained string; schema/shapes.ttl's sh:in enforces the same six values CI-side." .
 
 ds:Dcp
   a ds:TrustModel ;
   rdfs:label "DCP (Decentralized Claims Protocol)" ;
-  rdfs:comment "The Eclipse Dataspace Working Group's Decentralized Claims Protocol — named specifically, not folded into a generic DID/SSI bucket, because it is the dataspace connector stack this hub's own study is built around (ADR-0003/0004)'s *default* identity/credential-exchange mechanism: ADR-0008 vendors eclipse-edc/IdentityHub as DCP reference material, and docs/benchmarks/2026-08-27-dcp-auth-overhead.md measured its real (not stubbed) auth overhead — did:web resolution, ES256 verification, a live Presentation-API round trip. The most concretely-exercised trust model this repository has." .
+  rdfs:comment "The Eclipse Dataspace Working Group's Decentralized Claims Protocol — named specifically, not folded into a generic DID/SSI bucket, because it is the dataspace connector stack this hub's own study is built around (ADR-0003/0004)'s *default* identity/credential-exchange mechanism: ADR-0008 vendors eclipse-edc/IdentityHub as DCP reference material, and docs/benchmarks/2026-08-27-dcp-auth-overhead.md measured its real (not stubbed) auth overhead — did:web resolution, ES256 verification, a live Presentation-API round trip. The most concretely-exercised trust model this repository has. Formerly known as IATP (Identity And Trust Protocol) before the Eclipse Dataspace Working Group standardized it under this name — same lineage, not a separate protocol." .
+
+ds:OpenId4Vc
+  a ds:TrustModel ;
+  rdfs:label "OpenID4VC (OID4VCI / OID4VP)" ;
+  rdfs:comment "OpenID for Verifiable Credential Issuance and Presentation — named separately from ds:Eidas2Pki because it is a wire protocol, not a trust/regulatory layer: it is the protocol the EUDI Wallet Architecture Reference Framework mandates for eIDAS2, but it is also used entirely independently of eIDAS2 by many non-EU SSI deployments. An authority using eIDAS2's Trusted Lists over OpenID4VC should still declare ds:Eidas2Pki (the trust anchor is what this vocabulary tracks); this individual is for OpenID4VC deployments anchored some other way." .
 
 ds:DidSsiOther
   a ds:TrustModel ;
   rdfs:label "DID / SSI (other)" ;
-  rdfs:comment "Decentralized identifiers plus self-issued/self-sovereign credentials via a mechanism *other than* DCP — e.g. OIDC4VC/OpenID4VCI, DIDComm/Hyperledger Aries. Equally legitimate under ADR-0009's neutrality rule; kept distinct from ds:Dcp precisely so choosing this option doesn't quietly claim conformance with the specific protocol this hub has actually benchmarked." .
+  rdfs:comment "Decentralized identifiers plus self-issued/self-sovereign credentials via a mechanism other than DCP or OpenID4VC — e.g. DIDComm/Hyperledger Aries, or a KERI-based scheme (the self-certifying-identifier approach GLEIF's vLEI uses, structurally different from DID-document/ledger-based DIDs). Equally legitimate under ADR-0009's neutrality rule; kept distinct from ds:Dcp precisely so choosing this option doesn't quietly claim conformance with the specific protocol this hub has actually benchmarked." .
 
 ds:Eidas2Pki
   a ds:TrustModel ;
   rdfs:label "eIDAS2 / PKI Trusted List" ;
-  rdfs:comment "The EU eIDAS2/EUDI Wallet trust model: X.509/PKI-rooted Trusted Lists, structurally different from DID/SSI (no DLT, no self-certifying identifiers) — see the eIDAS2 spike this vocabulary's authors already ran." .
+  rdfs:comment "The EU eIDAS2/EUDI Wallet trust anchor: X.509/PKI-rooted Trusted Lists, structurally different from DID/SSI (no DLT, no self-certifying identifiers) — see the eIDAS2 spike this vocabulary's authors already ran. Orthogonal to, and commonly paired with, ds:OpenId4Vc as the wire protocol; this individual tracks the trust anchor, not the protocol on the wire." .
 
 ds:PkiGovernanceAuthority
   a ds:TrustModel ;
@@ -220,7 +225,7 @@ ds:trustModel
   rdfs:domain ds:Authority ;
   rdfs:range ds:TrustModel ;
   rdfs:label "trust model" ;
-  rdfs:comment "The trust model this authority operates under — one of ds:TrustModel's five individuals (DCP, DID/SSI-other, eIDAS2/PKI, PKI/Governance Authority, or from-scratch/other), not free text. In JSON-LD, the entry's @context types this property @type: @vocab so a compact term like \"Dcp\" expands to the IRI, not a string literal." .
+  rdfs:comment "The trust model this authority operates under — one of ds:TrustModel's six individuals (DCP, OpenID4VC, DID/SSI-other, eIDAS2/PKI, PKI/Governance Authority, or from-scratch/other), not free text. In JSON-LD, the entry's @context types this property @type: @vocab so a compact term like \"Dcp\" expands to the IRI, not a string literal." .
 
 ds:claimsIssued
   a owl:DatatypeProperty ;

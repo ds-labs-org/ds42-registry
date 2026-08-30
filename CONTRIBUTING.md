@@ -33,9 +33,9 @@ or service (no wizard for those roles yet).
    need an `endpoint` — CI does a plain reachability check against
    whichever one applies (see README.md), so make sure it's actually live
    before you open the PR. `trustModel` must be one of `Dcp`,
-   `DidSsiOther`, `Eidas2Pki`, `PkiGovernanceAuthority`, `FromScratch`
-   (CI rejects anything else — see README.md's "Layout" section for what
-   distinguishes `Dcp` from `DidSsiOther`).
+   `OpenId4Vc`, `DidSsiOther`, `Eidas2Pki`, `PkiGovernanceAuthority`,
+   `FromScratch` (CI rejects anything else — see README.md's "Layout"
+   section for what distinguishes them).
 3. Open a pull request. CI (`.github/workflows/validate.yml`) validates
    the file against the SHACL shapes, probes the URL above, and — for a
    new entry — merges automatically if your PR adds at most
