@@ -13,7 +13,7 @@
   "contact": "example-authority",
   "dateRegistered": "2026-08-30",
   "description": "Example trust anchor for the ds42 sandbox.",
-  "trustModel": "DidSsi",
+  "trustModel": "Dcp",
   "claimsIssued": "Membership credential attesting DSP conformance, issued after a self-declared conformance-suite run.",
   "onboardingUrl": "https://example-authority.example/onboard"
 }

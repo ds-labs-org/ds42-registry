@@ -98,14 +98,22 @@ validated or merged — documentation only). `authority` entries carry
 `trustModel`/`claimsIssued`/`onboardingUrl`; the other three roles carry
 an `endpoint` — see "How a PR gets merged" below for what that's used
 for. `trustModel` is a **controlled vocabulary, not free text** — one of
-`ds:DidSsi`, `ds:Eidas2Pki`, `ds:PkiGovernanceAuthority`, `ds:FromScratch`
-(`ds:TrustModel`'s four individuals in
+`ds:Dcp`, `ds:DidSsiOther`, `ds:Eidas2Pki`, `ds:PkiGovernanceAuthority`,
+`ds:FromScratch` (`ds:TrustModel`'s five individuals in
 [`schema/ontology.ttl`](schema/ontology.ttl)); write the bare name (e.g.
-`"trustModel": "DidSsi"`) and the entry's `@context` (`"trustModel":
+`"trustModel": "Dcp"`) and the entry's `@context` (`"trustModel":
 {"@type": "@vocab"}`, already in every example) expands it to the real
-IRI. ds42.org's Get Started wizard renders this as a dropdown generated
-from the same four individuals, not a hand-typed list — see dataspace's
-ADR-0013.
+IRI. `ds:Dcp` — the Decentralized Claims Protocol — is named specifically
+rather than folded into a generic DID/SSI bucket: it's this hub's own
+reference connector stack's default identity mechanism
+([ADR-0008](https://ds42.org/adr/0008) vendors `eclipse-edc/IdentityHub`
+as reference material, and
+[a benchmark](https://ds42.org/benchmarks/dcp-auth-overhead) already
+measured its real auth overhead), so `ds:DidSsiOther` exists
+alongside it for a DID/SSI approach that *isn't* DCP (OIDC4VC, DIDComm,
+etc.) without quietly claiming DCP conformance. ds42.org's Get Started
+wizard renders this as a dropdown generated from the same five
+individuals, not a hand-typed list — see dataspace's ADR-0013.
 
 Every entry file is self-contained: its `@context` is inlined (a
 `@vocab` pointing at `https://ds42.org/ns/registry#`, matching
