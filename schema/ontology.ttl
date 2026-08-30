@@ -130,7 +130,8 @@ ds:Authority
   a owl:Class ;
   rdfs:subClassOf ds:Registrant ;
   rdfs:label "Authority" ;
-  rdfs:comment "A trust anchor: issues participant credentials and defines an onboarding scheme. ds42 expects several, run by different members; the hub operates none itself. Its trust model is typically DID-based (see ds:trustModel) and its issuance role corresponds to an 'issuer' in the W3C Verifiable Credentials Data Model." .
+  rdfs:comment "A trust anchor: issues participant credentials and defines an onboarding scheme. ds42 expects several, run by different members; the hub operates none itself. Its trust model is typically DID-based (see ds:trustModel) and its issuance role corresponds to an 'issuer' in the W3C Verifiable Credentials Data Model." ;
+  rdfs:seeAlso <https://www.w3.org/2018/credentials#issuer> .
 
 ds:TrustModel
   a owl:Class ;
