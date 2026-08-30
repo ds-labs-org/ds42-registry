@@ -16,7 +16,7 @@ clear message per file. Checks, per file:
   - no other existing file under entries/<role>/ already uses the same
     slug
   - reachability probe (see probe_reachable()) of onboardingUrl
-    (authority) or endpoint (connector/federation-list/service) — this is
+    (authority) or endpoint (connector/catalog-broker/service) — this is
     NOT a Dataspace Protocol conformance check, just "does something
     answer at this URL". A real DSP conformance probe is deferred, see
     docs/adr/0010-*.md's Consequences.
@@ -40,7 +40,7 @@ PROBE_TIMEOUT_SECONDS = 8
 ROLE_DIR_TO_TYPE = {
     "connector": "Connector",
     "authority": "Authority",
-    "federation-list": "FederationList",
+    "catalog-broker": "CatalogBroker",
     "service": "Service",
 }
 

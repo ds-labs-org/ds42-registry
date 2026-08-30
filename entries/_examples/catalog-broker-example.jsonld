@@ -6,11 +6,11 @@
     "onboardingUrl": { "@type": "@id" },
     "endpoint": { "@type": "@id" }
   },
-  "@id": "https://ds42.org/registry/federation-list/example-federation-list",
-  "@type": "FederationList",
-  "slug": "example-federation-list",
-  "contact": "https://github.com/example-federation-list",
+  "@id": "https://ds42.org/registry/catalog-broker/example-catalog-broker",
+  "@type": "CatalogBroker",
+  "slug": "example-catalog-broker",
+  "contact": "https://github.com/example-catalog-broker",
   "dateRegistered": "2026-08-30",
   "description": "Example catalog broker: harvests other participants' catalogs and re-serves them for discovery.",
-  "endpoint": "https://broker.example-federation-list.example/catalog"
+  "endpoint": "https://broker.example-catalog-broker.example/catalog"
 }

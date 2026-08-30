@@ -2,7 +2,7 @@
 
 Anyone whose implementation speaks the Dataspace Protocol (or who's
 running a supporting service for it) is welcome to add themselves here,
-in any of ds42's four roles: `connector`, `authority`, `federation-list`,
+in any of ds42's four roles: `connector`, `authority`, `catalog-broker`,
 `service`. See [ds42.org](https://ds42.org) and its
 [ADR-0009](https://ds42.org/adr/0009) for what each role means.
 
@@ -13,14 +13,14 @@ If you're registering as an **authority**, it's faster to use
 Authority path logs you in with GitHub (OAuth Device Flow — no password,
 no client secret ever leaves your browser) and opens this exact PR for
 you automatically. Use the manual steps below only if you'd rather not
-use the wizard, or if you're registering as a connector, federation list,
+use the wizard, or if you're registering as a connector, catalog broker,
 or service (no wizard for those roles yet).
 
 ## Manual steps
 
 1. Fork this repository.
 2. Add `entries/<role>/<slug>.jsonld` — a JSON-LD document typed
-   (`@type`) as one of `Connector`, `Authority`, `FederationList`,
+   (`@type`) as one of `Connector`, `Authority`, `CatalogBroker`,
    `Service`, matching the vocabulary in
    [`schema/ontology.ttl`](schema/ontology.ttl) and validated against
    [`schema/shapes.ttl`](schema/shapes.ttl) — see

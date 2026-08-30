@@ -16,7 +16,7 @@
 # The ds42 participant registry vocabulary.
 #
 # Describes the four ADR-0009 membership roles (connector, authority,
-# federation-list, service) and the properties a registry entry
+# catalog-broker, service) and the properties a registry entry
 # (entries/<role>/<slug>.jsonld in ds-labs-org/ds42-registry) carries. See
 # dataspace's docs/adr/0010-*.md for why the registry uses JSON-LD/OWL/
 # SHACL rather than plain YAML/JSON Schema — this hub's own domain (DSP,
@@ -128,11 +128,11 @@ ds:Authority
   rdfs:label "Authority" ;
   rdfs:comment "A trust anchor: issues participant credentials and defines an onboarding scheme. ds42 expects several, run by different members; the hub operates none itself. Its trust model is typically DID-based (see ds:trustModel) and its issuance role corresponds to an 'issuer' in the W3C Verifiable Credentials Data Model." .
 
-ds:FederationList
+ds:CatalogBroker
   a owl:Class ;
   rdfs:subClassOf ds:Registrant ;
-  rdfs:label "Federation list" ;
-  rdfs:comment "A catalog broker: harvests other participants' catalogs and re-serves them for discovery. Speaking only part of DSP is a legitimate membership shape, not a deficiency. Broader than DSP's own dspace:CatalogService (a catalog-serving component type within one participant's self-description) — a ds42 federation list is a distinct, separately-registered participant that aggregates *other* participants' catalogs, closer to the eclipse-edc federated-catalog / ds-catalog-broker-rs pattern this study has already vendored/tracked." ;
+  rdfs:label "Catalog broker" ;
+  rdfs:comment "Harvests other participants' catalogs and re-serves them for discovery. Speaking only part of DSP is a legitimate membership shape, not a deficiency. Named CatalogBroker, not FederationList (dataspace ADR-0011): 'federation list' reads as a directory of who's in the federation, which this role is not — this registry itself is that. Broader than DSP's own dspace:CatalogService (a catalog-serving component type within one participant's self-description) — a ds42 catalog broker is a distinct, separately-registered participant that aggregates *other* participants' catalogs, closer to the eclipse-edc federated-catalog / ds-catalog-broker-rs pattern this study has already vendored/tracked (and the source of this class's name)." ;
   rdfs:seeAlso dspace:CatalogService .
 
 ds:Service
@@ -206,12 +206,12 @@ ds:onboardingUrl
   rdfs:label "onboarding URL" ;
   rdfs:comment "Where a participant goes to onboard and request a credential from this authority. Same shape of term as did:serviceEndpoint (DID Core §5.6) — a service endpoint associated with this authority's identity — which is exactly what the Dataspace Protocol's own context reuses did:serviceEndpoint for." .
 
-# --- Connector / federation-list / service property ----------------------
+# --- Connector / catalog-broker / service property ----------------------
 
 ds:endpoint
   a owl:ObjectProperty ;
   rdfs:subPropertyOf dcat:endpointURL ;
-  rdfs:domain [ a owl:Class ; owl:unionOf (ds:Connector ds:FederationList ds:Service) ] ;
+  rdfs:domain [ a owl:Class ; owl:unionOf (ds:Connector ds:CatalogBroker ds:Service) ] ;
   rdfs:label "endpoint" ;
   rdfs:comment "A URL confirming this participant is actually running something (CI's reachability probe — liveness only, not a Dataspace Protocol conformance check; see dataspace's ADR-0010). The same term DSP's own context uses (dcat:endpointURL) for a service's reachable address, reused here rather than re-derived." .
 
@@ -226,7 +226,7 @@ ds:Authority rdfs:subClassOf
 ds:Connector rdfs:subClassOf
   [ a owl:Restriction ; owl:onProperty ds:endpoint ; owl:minCardinality 1 ] .
 
-ds:FederationList rdfs:subClassOf
+ds:CatalogBroker rdfs:subClassOf
   [ a owl:Restriction ; owl:onProperty ds:endpoint ; owl:minCardinality 1 ] .
 
 ds:Service rdfs:subClassOf

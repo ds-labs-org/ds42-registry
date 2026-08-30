@@ -88,11 +88,11 @@ ds:AuthorityShape
 
 ds:EndpointRequiredShape
   a sh:NodeShape ;
-  sh:targetClass ds:Connector, ds:FederationList, ds:Service ;
+  sh:targetClass ds:Connector, ds:CatalogBroker, ds:Service ;
   sh:property [
     sh:path ds:endpoint ;
     sh:nodeKind sh:IRI ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
-    sh:message "connector/federation-list/service entries require exactly one endpoint, an IRI" ;
+    sh:message "connector/catalog-broker/service entries require exactly one endpoint, an IRI" ;
   ] .

@@ -5,8 +5,11 @@ volunteer-run, implementation-neutral experimentation hub for the
 Dataspace Protocol, modelled on [dn42](https://dn42.dev/Home)'s
 git-managed whois database. Membership on ds42 is conformance to DSP and
 nothing else, in any of four roles: **connector**, **authority**,
-**federation list**, or **service**. This repository is where a member
-says so — a stranger opens a pull request adding a file describing
+**catalog broker**, or **service** (originally named "federation list",
+renamed by [ADR-0011](https://ds42.org/adr/0011) so the name doesn't
+read as a directory of who's in the federation — this registry is
+that). This repository is where a member says so — a stranger opens a
+pull request adding a file describing
 themselves, CI checks it against the vocabulary below, and a well-formed,
 new-entry-only PR merges on its own. No central authority approves an
 entry by hand; that would contradict the hub's whole premise.
@@ -38,7 +41,7 @@ already depends on:
   `dcat:endpointURL` by another name, because the Dataspace Protocol
   itself reuses DCAT for exactly this.
 - **[The Dataspace Protocol's own vocabulary](https://w3id.org/dspace/2025/1/)**
-  — `ds:slug`/`ds:FederationList` are related to (not asserted equal to)
+  — `ds:slug`/`ds:CatalogBroker` are related to (not asserted equal to)
   DSP's own `dspace:participantId`/`dspace:CatalogService`.
 - **[International Data Spaces (IDS) Information Model](https://w3id.org/idsa/core/)**
   — DSP's direct ancestor, and the source of the closest actual naming
@@ -80,11 +83,11 @@ One JSON-LD file per participant entry, under:
 entries/<role>/<slug>.jsonld
 ```
 
-where `<role>` is one of `connector`, `authority`, `federation-list`,
+where `<role>` is one of `connector`, `authority`, `catalog-broker`,
 `service`, and `<slug>` is a short, URL-safe identifier for the
 participant (`^[a-z0-9-]+$`) — matching both the entry's `slug` property
 and the last path segment of its `@id`. Each entry is typed (`@type`) as
-one of `ds:Connector`, `ds:Authority`, `ds:FederationList`, `ds:Service`
+one of `ds:Connector`, `ds:Authority`, `ds:CatalogBroker`, `ds:Service`
 from [`schema/ontology.ttl`](schema/ontology.ttl), which is what CI
 checks against the entry's directory. The vocabulary and its per-role
 required properties are described in that same file; what CI actually
