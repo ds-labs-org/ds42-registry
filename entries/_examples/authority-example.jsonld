@@ -4,15 +4,16 @@
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "dateRegistered": { "@type": "xsd:date" },
     "onboardingUrl": { "@type": "@id" },
-    "endpoint": { "@type": "@id" }
+    "endpoint": { "@type": "@id" },
+    "trustModel": { "@type": "@vocab" }
   },
   "@id": "https://ds42.org/registry/authority/example-authority",
   "@type": "Authority",
   "slug": "example-authority",
-  "contact": "https://github.com/example-authority",
+  "contact": "example-authority",
   "dateRegistered": "2026-08-30",
   "description": "Example trust anchor for the ds42 sandbox.",
-  "trustModel": "DID/SSI (did:web), self-issued, no external federation.",
+  "trustModel": "DidSsi",
   "claimsIssued": "Membership credential attesting DSP conformance, issued after a self-declared conformance-suite run.",
   "onboardingUrl": "https://example-authority.example/onboard"
 }

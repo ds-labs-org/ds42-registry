@@ -97,7 +97,15 @@ for each role live under [`entries/_examples/`](entries/_examples/) (not
 validated or merged — documentation only). `authority` entries carry
 `trustModel`/`claimsIssued`/`onboardingUrl`; the other three roles carry
 an `endpoint` — see "How a PR gets merged" below for what that's used
-for.
+for. `trustModel` is a **controlled vocabulary, not free text** — one of
+`ds:DidSsi`, `ds:Eidas2Pki`, `ds:PkiGovernanceAuthority`, `ds:FromScratch`
+(`ds:TrustModel`'s four individuals in
+[`schema/ontology.ttl`](schema/ontology.ttl)); write the bare name (e.g.
+`"trustModel": "DidSsi"`) and the entry's `@context` (`"trustModel":
+{"@type": "@vocab"}`, already in every example) expands it to the real
+IRI. ds42.org's Get Started wizard renders this as a dropdown generated
+from the same four individuals, not a hand-typed list — see dataspace's
+ADR-0013.
 
 Every entry file is self-contained: its `@context` is inlined (a
 `@vocab` pointing at `https://ds42.org/ns/registry#`, matching

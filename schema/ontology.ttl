@@ -128,6 +128,32 @@ ds:Authority
   rdfs:label "Authority" ;
   rdfs:comment "A trust anchor: issues participant credentials and defines an onboarding scheme. ds42 expects several, run by different members; the hub operates none itself. Its trust model is typically DID-based (see ds:trustModel) and its issuance role corresponds to an 'issuer' in the W3C Verifiable Credentials Data Model." .
 
+ds:TrustModel
+  a owl:Class ;
+  owl:oneOf ( ds:DidSsi ds:Eidas2Pki ds:PkiGovernanceAuthority ds:FromScratch ) ;
+  rdfs:label "Trust model" ;
+  rdfs:comment "The closed set of trust models a ds:Authority may declare — surveyed in authority/README.md's 'Reference landscape' and 'Alternative trust model' sections. A controlled vocabulary, not free text, so the Get Started wizard can offer a real dropdown instead of an unconstrained string; schema/shapes.ttl's sh:in enforces the same four values CI-side." .
+
+ds:DidSsi
+  a ds:TrustModel ;
+  rdfs:label "DID / SSI" ;
+  rdfs:comment "Decentralized identifiers plus self-issued/self-sovereign credentials — e.g. eclipse-edc/IdentityHub, eclipse-tractusx/ssi-dim-wallet-stub. The reference landscape authority/README.md surveys in most depth." .
+
+ds:Eidas2Pki
+  a ds:TrustModel ;
+  rdfs:label "eIDAS2 / PKI Trusted List" ;
+  rdfs:comment "The EU eIDAS2/EUDI Wallet trust model: X.509/PKI-rooted Trusted Lists, structurally different from DID/SSI (no DLT, no self-certifying identifiers) — see the eIDAS2 spike this vocabulary's authors already ran." .
+
+ds:PkiGovernanceAuthority
+  a ds:TrustModel ;
+  rdfs:label "PKI / Governance Authority" ;
+  rdfs:comment "A PKI anchored by a dataspace-specific Governance Authority rather than a Trusted List or DIDs — the SIMPL/SIMPL-Open pattern, a third trust-anchor shape alongside the two above." .
+
+ds:FromScratch
+  a ds:TrustModel ;
+  rdfs:label "From-scratch / other" ;
+  rdfs:comment "Not yet catalogued above. ADR-0009 welcomes a from-scratch issuer as equally legitimate as an established one — this option exists so the closed vocabulary above never becomes a gate on who may register." .
+
 ds:CatalogBroker
   a owl:Class ;
   rdfs:subClassOf ds:Registrant ;
@@ -185,11 +211,11 @@ ds:registeredBy
 # --- Authority-specific properties ---------------------------------------
 
 ds:trustModel
-  a owl:DatatypeProperty ;
+  a owl:ObjectProperty ;
   rdfs:domain ds:Authority ;
-  rdfs:range xsd:string ;
+  rdfs:range ds:TrustModel ;
   rdfs:label "trust model" ;
-  rdfs:comment "The trust model this authority operates under (DID/SSI, eIDAS2/PKI, from-scratch, etc.)." .
+  rdfs:comment "The trust model this authority operates under — one of ds:TrustModel's four individuals (DID/SSI, eIDAS2/PKI, PKI/Governance Authority, or from-scratch/other), not free text. In JSON-LD, the entry's @context types this property @type: @vocab so a compact term like \"DidSsi\" expands to the IRI, not a string literal." .
 
 ds:claimsIssued
   a owl:DatatypeProperty ;

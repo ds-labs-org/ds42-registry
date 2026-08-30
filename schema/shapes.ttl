@@ -66,10 +66,10 @@ ds:AuthorityShape
   sh:targetClass ds:Authority ;
   sh:property [
     sh:path ds:trustModel ;
-    sh:datatype xsd:string ;
+    sh:in ( ds:DidSsi ds:Eidas2Pki ds:PkiGovernanceAuthority ds:FromScratch ) ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
-    sh:message "authority entries require exactly one trustModel string" ;
+    sh:message "authority entries require exactly one trustModel from the controlled vocabulary (DidSsi, Eidas2Pki, PkiGovernanceAuthority, FromScratch) -- see schema/ontology.ttl's ds:TrustModel" ;
   ] ;
   sh:property [
     sh:path ds:claimsIssued ;
