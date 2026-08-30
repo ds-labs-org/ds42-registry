@@ -1,9 +1,15 @@
-@prefix ds:     <https://ds42.org/ns/registry#> .
-@prefix owl:    <http://www.w3.org/2002/07/owl#> .
-@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix ds:      <https://ds42.org/ns/registry#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dcat:    <http://www.w3.org/ns/dcat#> .
+@prefix dspace:  <https://w3id.org/dspace/2025/1/> .
+@prefix did:     <https://www.w3.org/ns/did#> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix org:     <http://www.w3.org/ns/org#> .
+@prefix gx:      <https://w3id.org/gaia-x/2404#> .
 
 #
 # The ds42 participant registry vocabulary.
@@ -22,36 +28,96 @@
 # this study hasn't wired up a live endpoint for. Validation
 # (schema/shapes.ttl) does not require it to resolve.
 #
+# --- Grounding in existing dataspace/identity vocabularies ---------------
+#
+# This vocabulary deliberately does not stand alone. Every class/property
+# below is linked, where a genuine correspondence exists, to a real term
+# from an established vocabulary this hub's own domain already depends
+# on — verified against each vocabulary's actual current definition
+# rather than assumed, so a link below is either `rdfs:subPropertyOf`/
+# `rdfs:subClassOf` (a confident, checked equivalence) or `rdfs:seeAlso`
+# (a genuine relation, stated without asserting the two terms mean
+# exactly the same thing — used where the external vocabulary's own
+# scope is broader/narrower/differently-shaped than this registry's, or
+# its current definition wasn't independently confirmed against a primary
+# source). No `owl:imports` of any of these: none is a dependency this
+# repository's own tooling needs to fetch, and asserting a hard import on
+# a vocabulary whose long-term URL stability wasn't verified here would
+# be the same kind of overclaiming this repo's `CLAUDE.md` warns against
+# elsewhere (`authority/`'s placeholders, ADR-0009's deferred items).
+#
+# - **DCAT** (`dcat:`, W3C Data Catalog Vocabulary,
+#   <http://www.w3.org/ns/dcat#>) — the vocabulary the Dataspace Protocol
+#   itself reuses for catalogs and service endpoints (see dspace: below);
+#   `ds:endpoint` is a `dcat:endpointURL` by another name for exactly that
+#   reason.
+# - **The Dataspace Protocol's own vocabulary** (`dspace:`,
+#   <https://w3id.org/dspace/2025/1/>, confirmed from its published
+#   `context.jsonld`) — the protocol this hub exists to experiment with.
+#   DSP's own context defines `dspace:participantId` (a dataspace
+#   participant's identifier) and `dspace:CatalogService` (a
+#   catalog-serving component), both linked below, and itself reuses
+#   `dcat:` and `did:` (see below) rather than minting everything fresh —
+#   this vocabulary follows the same reuse discipline.
+# - **W3C DID Core** (`did:`, <https://www.w3.org/ns/did#>) —
+#   `did:serviceEndpoint` (DID Core §5.6) is the term DSP's own context
+#   reuses for endpoint URLs associated with a subject's identity; ds42's
+#   `ds:onboardingUrl` — an authority's identity/credential-issuance
+#   endpoint — is the same shape of thing.
+# - **Gaia-X** (`gx:`, namespace pattern
+#   <https://w3id.org/gaia-x/{version}#>, `2404` = the 24.04 Trust
+#   Framework release) — the closest existing prior art for exactly this
+#   registry's purpose: participant self-descriptions as JSON-LD,
+#   validated by SHACL shapes (the same combination this registry
+#   independently arrived at), built on DCAT for resources and the W3C
+#   Organization Ontology for participants. Gaia-X's own self-description
+#   credentials type a participant as `gx:LegalParticipant`. ds42's
+#   entries are related in kind — a participant declaring itself into a
+#   dataspace — but are a much lighter-weight role declaration, not a
+#   full legal-entity self-description (no legal name, registration
+#   number, or registered address), so classes below are linked via
+#   `rdfs:seeAlso` rather than asserted equivalent to Gaia-X's.
+# - **W3C Organization Ontology** (`org:`,
+#   <http://www.w3.org/ns/org#>) and **FOAF** (`foaf:`,
+#   <http://xmlns.com/foaf/0.1/>) — what Gaia-X itself grounds
+#   participant modelling in; linked here for the same reason, softly
+#   (`rdfs:seeAlso`), since a ds42 entry names a participant rather than
+#   modelling it as a full `org:Organization`/`foaf:Agent` resource.
+#
 <https://ds42.org/ns/registry>
   a owl:Ontology ;
   rdfs:label "ds42 participant registry vocabulary" ;
   rdfs:comment "Classes and properties for ds42.org's participant registry entries (entries/<role>/<slug>.jsonld in ds-labs-org/ds42-registry)." ;
-  dcterms:isPartOf <https://ds42.org> .
+  dcterms:isPartOf <https://ds42.org> ;
+  dcterms:relation dcat: , dspace: , did: , foaf: , org: , gx: .
 
 # --- Classes -----------------------------------------------------------
 
 ds:ParticipantEntry
   a owl:Class ;
   rdfs:label "Participant entry" ;
-  rdfs:comment "A ds42 member's declaration of one role it holds. Abstract: real entries are typed as exactly one of the four concrete subclasses below, per ADR-0009's four ways to participate." .
+  rdfs:comment "A ds42 member's declaration of one role it holds. Abstract: real entries are typed as exactly one of the four concrete subclasses below, per ADR-0009's four ways to participate. Related to, but lighter-weight than, Gaia-X's gx:LegalParticipant self-description (which Gaia-X itself grounds in org:Organization/foaf:Agent) — a ds42 entry names a role a participant holds, not a full legal-entity self-description." ;
+  rdfs:seeAlso gx:LegalParticipant , org:Organization , foaf:Agent .
 
 ds:Connector
   a owl:Class ;
   rdfs:subClassOf ds:ParticipantEntry ;
   rdfs:label "Connector" ;
-  rdfs:comment "A DSP participant: publishes a catalog, negotiates contracts, transfers data. The baseline ds42 role." .
+  rdfs:comment "A DSP participant: publishes a catalog, negotiates contracts, transfers data. The baseline ds42 role." ;
+  rdfs:seeAlso dcat:DataService .
 
 ds:Authority
   a owl:Class ;
   rdfs:subClassOf ds:ParticipantEntry ;
   rdfs:label "Authority" ;
-  rdfs:comment "A trust anchor: issues participant credentials and defines an onboarding scheme. ds42 expects several, run by different members; the hub operates none itself." .
+  rdfs:comment "A trust anchor: issues participant credentials and defines an onboarding scheme. ds42 expects several, run by different members; the hub operates none itself. Its trust model is typically DID-based (see ds:trustModel) and its issuance role corresponds to an 'issuer' in the W3C Verifiable Credentials Data Model." .
 
 ds:FederationList
   a owl:Class ;
   rdfs:subClassOf ds:ParticipantEntry ;
   rdfs:label "Federation list" ;
-  rdfs:comment "A catalog broker: harvests other participants' catalogs and re-serves them for discovery. Speaking only part of DSP is a legitimate membership shape, not a deficiency." .
+  rdfs:comment "A catalog broker: harvests other participants' catalogs and re-serves them for discovery. Speaking only part of DSP is a legitimate membership shape, not a deficiency. Broader than DSP's own dspace:CatalogService (a catalog-serving component type within one participant's self-description) — a ds42 federation list is a distinct, separately-registered participant that aggregates *other* participants' catalogs, closer to the eclipse-edc federated-catalog / ds-catalog-broker-rs pattern this study has already vendored/tracked." ;
+  rdfs:seeAlso dspace:CatalogService .
 
 ds:Service
   a owl:Class ;
@@ -66,14 +132,16 @@ ds:slug
   rdfs:domain ds:ParticipantEntry ;
   rdfs:range xsd:string ;
   rdfs:label "slug" ;
-  rdfs:comment "Short, URL-safe identifier for this participant (pattern ^[a-z0-9-]+$), unique within its role. Must match the entry's own file name and the last segment of its @id." .
+  rdfs:comment "Short, URL-safe identifier for this participant (pattern ^[a-z0-9-]+$), unique within its role. Must match the entry's own file name and the last segment of its @id. Registry-local and human-chosen, not necessarily the same value/format as a dspace:participantId used in a live DSP exchange — the same *kind* of identifier, not asserted to be interchangeable with it." ;
+  rdfs:seeAlso dspace:participantId .
 
 ds:contact
   a owl:DatatypeProperty ;
   rdfs:domain ds:ParticipantEntry ;
   rdfs:range xsd:string ;
   rdfs:label "contact" ;
-  rdfs:comment "A GitHub handle or URL a stranger can use to reach this participant." .
+  rdfs:comment "A GitHub handle or URL a stranger can use to reach this participant." ;
+  rdfs:seeAlso foaf:Agent .
 
 ds:dateRegistered
   a owl:DatatypeProperty ;
@@ -112,21 +180,24 @@ ds:claimsIssued
   rdfs:domain ds:Authority ;
   rdfs:range xsd:string ;
   rdfs:label "claims issued" ;
-  rdfs:comment "What claims/credentials this authority issues, and to whom." .
+  rdfs:comment "What claims/credentials this authority issues, and to whom." ;
+  rdfs:seeAlso <https://www.w3.org/2018/credentials#VerifiableCredential> .
 
 ds:onboardingUrl
   a owl:ObjectProperty ;
+  rdfs:subPropertyOf did:serviceEndpoint ;
   rdfs:domain ds:Authority ;
   rdfs:label "onboarding URL" ;
-  rdfs:comment "Where a participant goes to onboard and request a credential from this authority." .
+  rdfs:comment "Where a participant goes to onboard and request a credential from this authority. Same shape of term as did:serviceEndpoint (DID Core §5.6) — a service endpoint associated with this authority's identity — which is exactly what the Dataspace Protocol's own context reuses did:serviceEndpoint for." .
 
 # --- Connector / federation-list / service property ----------------------
 
 ds:endpoint
   a owl:ObjectProperty ;
+  rdfs:subPropertyOf dcat:endpointURL ;
   rdfs:domain [ a owl:Class ; owl:unionOf (ds:Connector ds:FederationList ds:Service) ] ;
   rdfs:label "endpoint" ;
-  rdfs:comment "A URL confirming this participant is actually running something (CI's reachability probe — liveness only, not a Dataspace Protocol conformance check; see dataspace's ADR-0010)." .
+  rdfs:comment "A URL confirming this participant is actually running something (CI's reachability probe — liveness only, not a Dataspace Protocol conformance check; see dataspace's ADR-0010). The same term DSP's own context uses (dcat:endpointURL) for a service's reachable address, reused here rather than re-derived." .
 
 # --- Cardinality restrictions (descriptive; schema/shapes.ttl is what CI
 #     actually enforces — see that file's header for why the split) -------

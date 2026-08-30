@@ -27,6 +27,38 @@ for the full reasoning. Both live in the
 [`dataspace`](https://labs.deepthought-solutions.net/Deepthought-Solutions/dataspace)
 repository.
 
+## Vocabulary grounding
+
+`schema/ontology.ttl` doesn't mint everything from scratch — every
+class/property is checked against, and where a genuine correspondence
+exists, linked to, a real term from a vocabulary this hub's own domain
+already depends on:
+
+- **[DCAT](http://www.w3.org/ns/dcat#)** — `ds:endpoint` is
+  `dcat:endpointURL` by another name, because the Dataspace Protocol
+  itself reuses DCAT for exactly this.
+- **[The Dataspace Protocol's own vocabulary](https://w3id.org/dspace/2025/1/)**
+  — `ds:slug`/`ds:FederationList` are related to (not asserted equal to)
+  DSP's own `dspace:participantId`/`dspace:CatalogService`.
+- **[W3C DID Core](https://www.w3.org/ns/did#)** — `ds:onboardingUrl` is a
+  `did:serviceEndpoint`, the same term DSP's own context reuses for
+  identity-associated endpoints.
+- **[Gaia-X](https://w3id.org/gaia-x/2404#)** — the closest existing
+  prior art for this registry's whole approach: JSON-LD self-descriptions
+  validated by SHACL, built on DCAT and the W3C Organization Ontology.
+  `ds:ParticipantEntry` is related to Gaia-X's `gx:LegalParticipant` by
+  `rdfs:seeAlso`, not equivalence — a ds42 entry is a much lighter-weight
+  role declaration, not a full legal-entity self-description.
+- **[W3C Organization Ontology](http://www.w3.org/ns/org#)** and
+  **[FOAF](http://xmlns.com/foaf/0.1/)** — what Gaia-X itself grounds
+  participant modelling in, linked the same way for the same reason.
+
+`schema/ontology.ttl`'s own header comment has the full reasoning per
+term, including why these are `rdfs:seeAlso`/`rdfs:subPropertyOf` links
+rather than `owl:imports` (none of these are fetched by this repo's own
+tooling, and none of their long-term URL stability was verified as part
+of this work — asserting a hard dependency on them would overclaim).
+
 ## Layout
 
 One JSON-LD file per participant entry, under:
