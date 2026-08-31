@@ -5,7 +5,8 @@
     "dateRegistered": { "@type": "xsd:date" },
     "onboardingUrl": { "@type": "@id" },
     "endpoint": { "@type": "@id" },
-    "trustModel": { "@type": "@vocab" }
+    "trustModel": { "@type": "@vocab" },
+    "issuerProtocol": { "@type": "@vocab" }
   },
   "@id": "https://ds42.org/registry/authority/example-authority",
   "@type": "Authority",
@@ -15,5 +16,10 @@
   "description": "Example trust anchor for the ds42 sandbox.",
   "trustModel": "Dcp",
   "claimsIssued": "Membership credential attesting DSP conformance, issued after a self-declared conformance-suite run.",
-  "onboardingUrl": "https://example-authority.example/onboard"
+  "onboardingUrl": "https://example-authority.example/onboard",
+  "registersIssuer": {
+    "@id": "https://ds42.org/registry/authority/example-authority#issuer",
+    "@type": "Issuer",
+    "issuerDid": "did:web:example-authority.example"
+  }
 }

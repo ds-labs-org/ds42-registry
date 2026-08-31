@@ -59,6 +59,11 @@ ds:RegistrantShape
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     sh:message "registeredBy, if present, must be a single string" ;
+  ] ;
+  sh:property [
+    sh:path ds:registersIssuer ;
+    sh:class ds:Issuer ;
+    sh:message "registersIssuer, if present, must reference a ds:Issuer" ;
   ] .
 
 ds:AuthorityShape
@@ -84,6 +89,38 @@ ds:AuthorityShape
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:message "authority entries require exactly one onboardingUrl, an IRI" ;
+  ] .
+
+ds:IssuerShape
+  a sh:NodeShape ;
+  sh:targetClass ds:Issuer ;
+  sh:property [
+    sh:path ds:issuerDid ;
+    sh:datatype xsd:string ;
+    sh:pattern "^did:" ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:message "issuer entries require exactly one issuerDid, a did: URI string" ;
+  ] ;
+  sh:property [
+    # No sh:minCount and no sh:maxCount: optional and repeatable -- see
+    # schema/ontology.ttl's ds:issuerProtocol comment. Optional because
+    # it's typically redundant with the registering ds:Authority's own
+    # ds:trustModel in the common case; repeatable because one issuer's
+    # keys commonly speak more than one wire protocol at once (e.g. DCP
+    # and OpenID4VC over the same credential) -- sh:in still checks every
+    # value present, individually, against the controlled vocabulary.
+    sh:path ds:issuerProtocol ;
+    sh:in ( ds:Dcp ds:OpenId4Vc ds:DidSsiOther ds:Eidas2Pki ds:PkiGovernanceAuthority ds:FromScratch ) ;
+    sh:message "issuerProtocol, if present, every value must come from the controlled vocabulary -- see schema/ontology.ttl's ds:TrustModel" ;
+  ] ;
+  sh:property [
+    # No sh:minCount: optional, same reasoning as issuerProtocol above,
+    # for ds:Authority's own ds:claimsIssued.
+    sh:path ds:issuerClaims ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:message "issuerClaims, if present, must be a single string" ;
   ] .
 
 ds:EndpointRequiredShape

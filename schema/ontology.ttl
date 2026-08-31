@@ -83,7 +83,9 @@
 #   `did:serviceEndpoint` (DID Core §5.6) is the term DSP's own context
 #   reuses for endpoint URLs associated with a subject's identity; ds42's
 #   `ds:onboardingUrl` — an authority's identity/credential-issuance
-#   endpoint — is the same shape of thing.
+#   endpoint — is the same shape of thing. `did:id` (the DID Subject's own
+#   identifier property) is linked from `ds:Issuer` and `ds:issuerDid` for
+#   the same reason.
 # - **Gaia-X** (`gx:`, namespace pattern
 #   <https://w3id.org/gaia-x/{version}#>, `2404` = the 24.04 Trust
 #   Framework release) — the closest existing prior art for exactly this
@@ -182,6 +184,41 @@ ds:Service
   rdfs:label "Service" ;
   rdfs:comment "Anything else the network is more useful for having: vocabulary/shape-validation endpoints, policy-decision services, identity resolution hosting, a conformance-suite runner, monitoring, a looking glass." .
 
+# --- Issuer (not a fifth Registrant role) ---------------------------------
+#
+# ds:Issuer is deliberately NOT rdfs:subClassOf ds:Registrant: ADR-0009's
+# four membership roles (above) stay exactly four. What this models
+# instead is a narrower technical fact orthogonal to that role split — a
+# DID-anchored identity that actually holds signing keys and issues
+# verifiable credentials over the wire — DCP, OpenID4VC, or, since the
+# same keys don't care which wire format carries them, both at once (see
+# ds:issuerProtocol, below). ds:Authority
+# already carries a *governance* issuance role (trustModel/claimsIssued/
+# onboardingUrl: who this member trusts, what scheme it runs); ds:Issuer
+# is the operational counterpart, and it is not exclusive to Authority —
+# a Connector or Service may also operate one (e.g. to sign its own
+# self-attestations) without taking on the full Authority role. Any
+# ds:Registrant, of any of the four roles, may register one or more via
+# ds:registersIssuer, below.
+#
+# Only ds:issuerDid is required on ds:Issuer itself. ds:issuerProtocol and
+# ds:issuerClaims are deliberately optional, not because they're
+# unimportant, but because for the common case this vocabulary expects to
+# dominate — a ds:Authority registering exactly one ds:Issuer that speaks
+# for it — they'd just restate that Authority's own ds:trustModel/
+# ds:claimsIssued verbatim; see the entries/_examples/authority-example.jsonld
+# fixture, which omits them for exactly this reason. State them
+# explicitly only where they'd actually diverge: a non-Authority
+# Registrant (no ds:trustModel/ds:claimsIssued to fall back on at all), or
+# an Authority operating more than one ds:Issuer with different protocols
+# or claims than its own governance-level declaration.
+#
+ds:Issuer
+  a owl:Class ;
+  rdfs:label "Issuer" ;
+  rdfs:comment "A DID-anchored identity that signs and issues verifiable credentials — the W3C Verifiable Credentials Data Model's 'issuer' concept, given its own dereferenceable resource here. Registered by a ds:Registrant of any role via ds:registersIssuer; see that property and ds:Authority for how this relates to the registry's own governance-level issuance role. Only ds:issuerDid is required; ds:issuerProtocol/ds:issuerClaims are optional, since for a ds:Authority registering its own single Issuer they'd typically just restate ds:trustModel/ds:claimsIssued." ;
+  rdfs:seeAlso <https://www.w3.org/2018/credentials#issuer> , did:id .
+
 # --- Properties common to every entry -----------------------------------
 
 ds:slug
@@ -223,6 +260,15 @@ ds:registeredBy
   rdfs:label "registered by" ;
   rdfs:comment "Informational only, set automatically by the Get started wizard: the GitHub login that opened the registering PR. Never trusted by CI for authorization — see schema/shapes.ttl and dataspace's ADR-0010 for the actual (git-blame-based) authorship check." .
 
+# --- Issuer registration (any Registrant, not only Authority) ------------
+
+ds:registersIssuer
+  a owl:ObjectProperty ;
+  rdfs:domain ds:Registrant ;
+  rdfs:range ds:Issuer ;
+  rdfs:label "registers issuer" ;
+  rdfs:comment "Links this Registrant to a ds:Issuer identity it operates or vouches for. Optional and repeatable — most entries have none; unlike ds:Authority's own trustModel/claimsIssued/onboardingUrl (which describe the Registrant's own governance role and stay domain ds:Authority), this property's domain is ds:Registrant itself, so a Connector, CatalogBroker or Service can register one too, not only an Authority." .
+
 # --- Authority-specific properties ---------------------------------------
 
 ds:trustModel
@@ -246,6 +292,31 @@ ds:onboardingUrl
   rdfs:domain ds:Authority ;
   rdfs:label "onboarding URL" ;
   rdfs:comment "Where a participant goes to onboard and request a credential from this authority. Same shape of term as did:serviceEndpoint (DID Core §5.6) — a service endpoint associated with this authority's identity — which is exactly what the Dataspace Protocol's own context reuses did:serviceEndpoint for." .
+
+# --- Issuer-specific properties -------------------------------------------
+
+ds:issuerDid
+  a owl:DatatypeProperty ;
+  rdfs:domain ds:Issuer ;
+  rdfs:range xsd:string ;
+  rdfs:label "issuer DID" ;
+  rdfs:comment "The did:... identifier this issuer signs credentials as — a string, not an IRI-typed reference, since a DID is itself the identifier (resolving it is a separate step, method-dependent: did:web, did:key, and similar each resolve differently)." ;
+  rdfs:seeAlso did:id .
+
+ds:issuerProtocol
+  a owl:ObjectProperty ;
+  rdfs:domain ds:Issuer ;
+  rdfs:range ds:TrustModel ;
+  rdfs:label "issuer protocol" ;
+  rdfs:comment "Which wire protocol(s) this issuer actually speaks to present/verify what it issues — reuses ds:TrustModel's same closed vocabulary (most commonly ds:Dcp or ds:OpenId4Vc for a ds:Issuer specifically, since the trust-anchor-only individuals like ds:Eidas2Pki describe a regulatory anchor rather than something an issuer 'speaks'). Deliberately the same enumeration as ds:Authority's ds:trustModel rather than a second one, since they are the same underlying six-way choice asked from a different resource. Repeatable, not exclusive: the DID and keys behind one ds:Issuer don't change depending on the wire format, so the same issuer commonly speaks more than one at once (e.g. ds:Dcp for EDC-based dataspace connectors and ds:OpenId4Vc for wallet-based verifiers, over the same credential) — one ds:Issuer with two values here, not two separate ds:Issuer entries sharing a ds:issuerDid. Optional overall: omit it entirely when it would just restate the registering ds:Authority's own ds:trustModel; state it when this Issuer's Registrant has no ds:trustModel at all, or the Issuer's actual protocol coverage differs from (e.g. is broader than) that single declared value." .
+
+ds:issuerClaims
+  a owl:DatatypeProperty ;
+  rdfs:domain ds:Issuer ;
+  rdfs:range xsd:string ;
+  rdfs:label "issuer claims" ;
+  rdfs:comment "What this issuer actually signs and issues, and to whom — the ds:Issuer-scoped counterpart to ds:Authority's ds:claimsIssued, needed here too since a ds:Issuer can be registered by a Registrant that isn't an Authority and so wouldn't otherwise carry that property. Optional for the same reason ds:issuerProtocol is: omit it when it would just restate the registering ds:Authority's own ds:claimsIssued." ;
+  rdfs:seeAlso <https://www.w3.org/2018/credentials#VerifiableCredential> .
 
 # --- Connector / catalog-broker / service property ----------------------
 
@@ -274,6 +345,18 @@ ds:Authority rdfs:subClassOf
   [ a owl:Restriction ; owl:onProperty ds:trustModel ;   owl:minCardinality 1 ] ,
   [ a owl:Restriction ; owl:onProperty ds:claimsIssued ; owl:minCardinality 1 ] ,
   [ a owl:Restriction ; owl:onProperty ds:onboardingUrl ; owl:minCardinality 1 ] .
+
+# ds:registersIssuer carries no restriction here: it is optional and
+# repeatable for every Registrant, matching ds:description above.
+# ds:issuerProtocol and ds:issuerClaims carry no restriction here either,
+# for a related but distinct reason: they're genuinely optional, not
+# because they're unimportant, but because they'd typically just restate
+# the registering ds:Authority's own ds:trustModel/ds:claimsIssued in the
+# common one-Authority-one-Issuer case (see ds:Issuer's own comment,
+# above, and entries/_examples/authority-example.jsonld). Only
+# ds:issuerDid is actually required.
+ds:Issuer rdfs:subClassOf
+  [ a owl:Restriction ; owl:onProperty ds:issuerDid ; owl:minCardinality 1 ] .
 
 ds:Connector rdfs:subClassOf
   [ a owl:Restriction ; owl:onProperty ds:endpoint ; owl:minCardinality 1 ] .
