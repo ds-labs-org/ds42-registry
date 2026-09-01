@@ -64,6 +64,11 @@ ds:RegistrantShape
     sh:path ds:registersIssuer ;
     sh:class ds:Issuer ;
     sh:message "registersIssuer, if present, must reference a ds:Issuer" ;
+  ] ;
+  sh:property [
+    sh:path ds:registersVerifiableDataRegistry ;
+    sh:class ds:VerifiableDataRegistry ;
+    sh:message "registersVerifiableDataRegistry, if present, must reference a ds:VerifiableDataRegistry" ;
   ] .
 
 ds:AuthorityShape
@@ -121,6 +126,23 @@ ds:IssuerShape
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     sh:message "issuerClaims, if present, must be a single string" ;
+  ] .
+
+ds:VerifiableDataRegistryShape
+  a sh:NodeShape ;
+  sh:targetClass ds:VerifiableDataRegistry ;
+  sh:property [
+    sh:path ds:vdrEndpoint ;
+    sh:nodeKind sh:IRI ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:message "verifiable data registry entries require exactly one vdrEndpoint, an IRI" ;
+  ] ;
+  sh:property [
+    sh:path ds:vdrMethods ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:message "vdrMethods, if present, must be a single string" ;
   ] .
 
 ds:EndpointRequiredShape
