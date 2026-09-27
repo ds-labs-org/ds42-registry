@@ -6,7 +6,8 @@
     "onboardingUrl": { "@type": "@id" },
     "endpoint": { "@type": "@id" },
     "trustModel": { "@type": "@vocab" },
-    "issuerProtocol": { "@type": "@vocab" }
+    "issuerProtocol": { "@type": "@vocab" },
+    "vdrEndpoint": { "@type": "@id" }
   },
   "@id": "https://ds42.org/registry/authority/example-authority",
   "@type": "Authority",
@@ -21,5 +22,11 @@
     "@id": "https://ds42.org/registry/authority/example-authority#issuer",
     "@type": "Issuer",
     "issuerDid": "did:web:example-authority.example"
+  },
+  "registersVerifiableDataRegistry": {
+    "@id": "https://ds42.org/registry/authority/example-authority#vdr",
+    "@type": "VerifiableDataRegistry",
+    "vdrEndpoint": "https://example-authority.example/.well-known/did.json",
+    "vdrMethods": "did:web"
   }
 }

@@ -54,8 +54,8 @@
 # - **DCAT** (`dcat:`, W3C Data Catalog Vocabulary,
 #   <http://www.w3.org/ns/dcat#>) — the vocabulary the Dataspace Protocol
 #   itself reuses for catalogs and service endpoints (see dspace: below);
-#   `ds:endpoint` is a `dcat:endpointURL` by another name for exactly that
-#   reason.
+#   `ds:endpoint` and `ds:hubEndpoint` are each a `dcat:endpointURL` by
+#   another name for exactly that reason.
 # - **The Dataspace Protocol's own vocabulary** (`dspace:`,
 #   <https://w3id.org/dspace/2025/1/>, confirmed from its published
 #   `context.jsonld`) — the protocol this hub exists to experiment with.
@@ -219,6 +219,75 @@ ds:Issuer
   rdfs:comment "A DID-anchored identity that signs and issues verifiable credentials — the W3C Verifiable Credentials Data Model's 'issuer' concept, given its own dereferenceable resource here. Registered by a ds:Registrant of any role via ds:registersIssuer; see that property and ds:Authority for how this relates to the registry's own governance-level issuance role. Only ds:issuerDid is required; ds:issuerProtocol/ds:issuerClaims are optional, since for a ds:Authority registering its own single Issuer they'd typically just restate ds:trustModel/ds:claimsIssued." ;
   rdfs:seeAlso <https://www.w3.org/2018/credentials#issuer> , did:id .
 
+# --- VocabularyHub (not a fifth Registrant role) --------------------------
+#
+# Same shape of design as ds:Issuer just above: a component orthogonal to
+# ADR-0009's four membership roles, not a fifth one. ADR-0009's own
+# ds:Service comment already names "vocabulary/shape-validation endpoints"
+# as one example of what a Service offers; ds:VocabularyHub gives that one
+# recurring shape its own dereferenceable resource and lets any Registrant
+# register one, not only a ds:Service — a Connector validating its own
+# catalog entries before publishing, or an Authority checking a credential
+# shape before issuance, are both real cases with no Service role of their
+# own to hang the endpoint off of. Registered via ds:registersVocabularyHub,
+# below, the same optional/repeatable shape as ds:registersIssuer.
+#
+# Only ds:hubEndpoint is required — the one fact that actually identifies
+# the thing (a reachable URL, same requiredness shape as ds:issuerDid for
+# ds:Issuer). ds:hubVocabularies is optional free text, not a controlled
+# vocabulary: unlike ds:TrustModel's closed six-way choice, the space of
+# RDF vocabularies/SHACL shapes a hub might validate against is open-ended
+# and not this registry's to enumerate.
+#
+ds:VocabularyHub
+  a owl:Class ;
+  rdfs:label "Vocabulary Hub" ;
+  rdfs:comment "An endpoint that validates RDF data against a stated set of vocabularies/SHACL shapes — the concrete shape of ADR-0009's ds:Service 'vocabulary and shape-validation endpoints' example, given its own dereferenceable resource here. Registered by a ds:Registrant of any role via ds:registersVocabularyHub." ;
+  rdfs:seeAlso <https://www.w3.org/TR/shacl/> .
+
+# --- VerifiableDataRegistry (not a fifth Registrant role) -----------------
+#
+# Same shape of design as ds:Issuer and ds:VocabularyHub just above: a
+# component orthogonal to ADR-0009's four membership roles, not a fifth
+# one. ADR-0009's own ds:Service comment already names "identity
+# resolution hosting" as one example of what a Service offers;
+# ds:VerifiableDataRegistry gives that recurring shape its own
+# dereferenceable resource and lets any Registrant register one, not only
+# a ds:Service — a Connector or Authority publishing its own did:web
+# document is, by the W3C Verifiable Credentials Data Model's own
+# definition, already acting as a verifiable data registry for that DID,
+# with no Service role of its own to hang the fact off of. Registered via
+# ds:registersVerifiableDataRegistry, below, the same optional/repeatable
+# shape as ds:registersIssuer/ds:registersVocabularyHub.
+#
+# Unlike ds:Issuer (which links to the VC Data Model's own dereferenceable
+# `credentials#issuer` term), the VC Data Model defines "verifiable data
+# registry" only in its prose Terminology section
+# (https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifiable-data-registries:
+# "A role a system might perform by mediating the creation and
+# verification of identifiers, verification material, and other relevant
+# data, such as verifiable credential schemas, revocation registries, and
+# so on") — confirmed directly against the published spec, not assumed —
+# with no associated class/term URI of its own. `ds:VerifiableDataRegistry`
+# is therefore this registry's own coinage, `rdfs:seeAlso`-linked to that
+# prose definition rather than any class it might otherwise subclass, the
+# same discipline this vocabulary applies everywhere else (no link
+# asserted stronger than what was actually checked).
+#
+# Only ds:vdrEndpoint is required — the one fact that actually identifies
+# the thing (a reachable URL, same requiredness shape as ds:hubEndpoint
+# for ds:VocabularyHub). ds:vdrMethods is optional free text, not a
+# controlled vocabulary: the space of DID methods / registry mechanisms a
+# VDR might serve (did:web, did:key, a revocation-status list, ...) is
+# open-ended and not this registry's to enumerate, the same reasoning as
+# ds:hubVocabularies.
+#
+ds:VerifiableDataRegistry
+  a owl:Class ;
+  rdfs:label "Verifiable Data Registry" ;
+  rdfs:comment "A system mediating the creation and verification of identifiers, verification material, and other relevant data (DID documents, credential schemas, revocation status) that a Verifier resolves independently of the Issuer — the W3C Verifiable Credentials Data Model's 'verifiable data registry' role, given its own dereferenceable resource here. For a did:web-anchored ds:Issuer, the web host serving its DID document already performs this role. Registered by a ds:Registrant of any role via ds:registersVerifiableDataRegistry." ;
+  rdfs:seeAlso <https://www.w3.org/TR/vc-data-model-2.0/#dfn-verifiable-data-registries> .
+
 # --- Properties common to every entry -----------------------------------
 
 ds:slug
@@ -269,6 +338,24 @@ ds:registersIssuer
   rdfs:label "registers issuer" ;
   rdfs:comment "Links this Registrant to a ds:Issuer identity it operates or vouches for. Optional and repeatable — most entries have none; unlike ds:Authority's own trustModel/claimsIssued/onboardingUrl (which describe the Registrant's own governance role and stay domain ds:Authority), this property's domain is ds:Registrant itself, so a Connector, CatalogBroker or Service can register one too, not only an Authority." .
 
+# --- VocabularyHub registration (any Registrant, not only Service) -------
+
+ds:registersVocabularyHub
+  a owl:ObjectProperty ;
+  rdfs:domain ds:Registrant ;
+  rdfs:range ds:VocabularyHub ;
+  rdfs:label "registers vocabulary hub" ;
+  rdfs:comment "Links this Registrant to a ds:VocabularyHub it operates. Optional and repeatable, the same shape as ds:registersIssuer — most entries have none, and any of the four roles may register one, not only a ds:Service." .
+
+# --- VerifiableDataRegistry registration (any Registrant, not only Service)
+
+ds:registersVerifiableDataRegistry
+  a owl:ObjectProperty ;
+  rdfs:domain ds:Registrant ;
+  rdfs:range ds:VerifiableDataRegistry ;
+  rdfs:label "registers verifiable data registry" ;
+  rdfs:comment "Links this Registrant to a ds:VerifiableDataRegistry it operates. Optional and repeatable, the same shape as ds:registersIssuer/ds:registersVocabularyHub — most entries have none, and any of the four roles may register one, not only a ds:Service." .
+
 # --- Authority-specific properties ---------------------------------------
 
 ds:trustModel
@@ -318,6 +405,38 @@ ds:issuerClaims
   rdfs:comment "What this issuer actually signs and issues, and to whom — the ds:Issuer-scoped counterpart to ds:Authority's ds:claimsIssued, needed here too since a ds:Issuer can be registered by a Registrant that isn't an Authority and so wouldn't otherwise carry that property. Optional for the same reason ds:issuerProtocol is: omit it when it would just restate the registering ds:Authority's own ds:claimsIssued." ;
   rdfs:seeAlso <https://www.w3.org/2018/credentials#VerifiableCredential> .
 
+# --- VocabularyHub-specific properties ------------------------------------
+
+ds:hubEndpoint
+  a owl:ObjectProperty ;
+  rdfs:subPropertyOf dcat:endpointURL ;
+  rdfs:domain ds:VocabularyHub ;
+  rdfs:label "hub endpoint" ;
+  rdfs:comment "The reachable URL of this vocabulary/shape-validation endpoint. Same shape of term as ds:endpoint (also a dcat:endpointURL), scoped separately because ds:endpoint's own domain is the three Registrant subclasses that expose one directly (Connector, CatalogBroker, Service) and ds:VocabularyHub is not a Registrant subclass." .
+
+ds:hubVocabularies
+  a owl:DatatypeProperty ;
+  rdfs:domain ds:VocabularyHub ;
+  rdfs:range xsd:string ;
+  rdfs:label "hub vocabularies" ;
+  rdfs:comment "Optional free text: which vocabularies/SHACL shapes this hub actually validates against (e.g. \"DCAT, ODRL, ds42's own registry ontology\"). Free text, not ds:TrustModel's kind of closed enumeration — the space of RDF vocabularies a hub might check is open-ended, not this registry's to enumerate." .
+
+# --- VerifiableDataRegistry-specific properties ---------------------------
+
+ds:vdrEndpoint
+  a owl:ObjectProperty ;
+  rdfs:subPropertyOf dcat:endpointURL ;
+  rdfs:domain ds:VerifiableDataRegistry ;
+  rdfs:label "VDR endpoint" ;
+  rdfs:comment "The reachable URL where this registry can be queried — a did:web host, a universal-resolver-style endpoint, or a revocation-status list. Same shape of term as ds:hubEndpoint (also a dcat:endpointURL), scoped separately because ds:VerifiableDataRegistry, like ds:VocabularyHub, is not a Registrant subclass." .
+
+ds:vdrMethods
+  a owl:DatatypeProperty ;
+  rdfs:domain ds:VerifiableDataRegistry ;
+  rdfs:range xsd:string ;
+  rdfs:label "VDR methods" ;
+  rdfs:comment "Optional free text: which DID methods or registry mechanisms this VDR actually serves (e.g. \"did:web\", \"did:web, revocation status list\"). Free text, not ds:TrustModel's kind of closed enumeration — the space of DID methods/registry mechanisms is open-ended, not this registry's to enumerate, the same reasoning as ds:hubVocabularies." .
+
 # --- Connector / catalog-broker / service property ----------------------
 
 ds:endpoint
@@ -357,6 +476,17 @@ ds:Authority rdfs:subClassOf
 # ds:issuerDid is actually required.
 ds:Issuer rdfs:subClassOf
   [ a owl:Restriction ; owl:onProperty ds:issuerDid ; owl:minCardinality 1 ] .
+
+# ds:registersVocabularyHub carries no restriction here either: optional
+# and repeatable for every Registrant, matching ds:registersIssuer above.
+ds:VocabularyHub rdfs:subClassOf
+  [ a owl:Restriction ; owl:onProperty ds:hubEndpoint ; owl:minCardinality 1 ] .
+
+# ds:registersVerifiableDataRegistry carries no restriction here either:
+# optional and repeatable for every Registrant, matching
+# ds:registersIssuer/ds:registersVocabularyHub above.
+ds:VerifiableDataRegistry rdfs:subClassOf
+  [ a owl:Restriction ; owl:onProperty ds:vdrEndpoint ; owl:minCardinality 1 ] .
 
 ds:Connector rdfs:subClassOf
   [ a owl:Restriction ; owl:onProperty ds:endpoint ; owl:minCardinality 1 ] .
