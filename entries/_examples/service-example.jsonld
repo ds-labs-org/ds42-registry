@@ -4,7 +4,8 @@
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "dateRegistered": { "@type": "xsd:date" },
     "onboardingUrl": { "@type": "@id" },
-    "endpoint": { "@type": "@id" }
+    "endpoint": { "@type": "@id" },
+    "hubEndpoint": { "@type": "@id" }
   },
   "@id": "https://ds42.org/registry/service/example-service",
   "@type": "Service",
@@ -12,5 +13,11 @@
   "contact": "https://github.com/example-service",
   "dateRegistered": "2026-08-30",
   "description": "Example supporting service: a policy-decision endpoint other participants can call.",
-  "endpoint": "https://pdp.example-service.example/health"
+  "endpoint": "https://pdp.example-service.example/health",
+  "registersVocabularyHub": {
+    "@id": "https://ds42.org/registry/service/example-service#vocabulary-hub",
+    "@type": "VocabularyHub",
+    "hubEndpoint": "https://vocab.example-service.example/validate",
+    "hubVocabularies": "DCAT, ODRL, ds42's own registry ontology (schema/ontology.ttl)"
+  }
 }
